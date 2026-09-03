@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HF 模型问题速查</title>
+<style>
+:root {
+  --bg: #0d1117; --bg2: #161b22; --bg3: #1c2333; --border: #30363d;
+  --text: #e6edf3; --text2: #8b949e; --accent: #58a6ff;
+  --high: #f85149; --medium: #d29922; --low: #3fb950;
+  --new-bg: rgba(63,185,80,0.18); --new-text: #3fb950;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f6f8fa; --bg2: #ffffff; --bg3: #eef1f4; --border: #d0d7de;
+    --text: #1f2328; --text2: #57606a; --accent: #0969da;
+    --high: #cf222e; --medium: #9a6700; --low: #1a7f37;
+    --new-bg: rgba(26,127,55,0.12); --new-text: #1a7f37;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f6f8fa; --bg2: #ffffff; --bg3: #eef1f4; --border: #d0d7de;
+  --text: #1f2328; --text2: #57606a; --accent: #0969da;
+  --high: #cf222e; --medium: #9a6700; --low: #1a7f37;
+  --new-bg: rgba(26,127,55,0.12); --new-text: #1a7f37;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 14px; line-height: 1.6; }
+
+.header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 20px 0; position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; }
+.header h1 { font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.header h1 span { color: var(--accent); }
+.header p { color: var(--text2); font-size: 13px; margin-top: 4px; }
+.theme-toggle { position: absolute; top: 0; right: 0; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 6px; padding: 4px 10px; font-size: 13px; cursor: pointer; }
+.theme-toggle:hover { color: var(--text); border-color: var(--accent); }
+
+.stats { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+.stat { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; font-size: 12px; color: var(--text2); }
+.stat strong { color: var(--text); }
+.stat.stat-new strong { color: var(--new-text); }
+
+.controls { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.search-box { flex: 1; min-width: 280px; padding: 8px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; outline: none; }
+.search-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,0.15); }
+.search-box::placeholder { color: var(--text2); }
+.filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn { padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); }
+.sort-select { padding: 6px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 12px; outline: none; cursor: pointer; }
+
+.main { max-width: 1400px; margin: 0 auto; padding: 0 20px 60px; }
+.family-tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.family-tab { padding: 4px 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.family-tab:hover { color: var(--text); }
+.family-tab.active { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); }
+.cat-tabs { display: flex; gap: 4px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+.cat-tab { padding: 6px 14px; border-radius: 6px 6px 0 0; border: 1px solid var(--border); border-bottom: none; background: var(--bg2); color: var(--text2); font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.cat-tab:hover { color: var(--text); }
+.cat-tab.active { background: var(--bg3); color: var(--accent); border-color: var(--accent); }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(520px, 1fr)); gap: 12px; }
+@media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; } }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; transition: border-color 0.15s; }
+.card:hover { border-color: var(--accent); }
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.card-model { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.card-model .quant { color: var(--text2); font-weight: 400; font-size: 13px; }
+.badge-row { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; line-height: 1.5; }
+.badge-new { background: var(--new-bg); color: var(--new-text); font-weight: 700; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+.severity-high { background: rgba(248,81,73,0.15); color: var(--high); }
+.severity-medium { background: rgba(210,153,34,0.15); color: var(--medium); }
+.severity-low { background: rgba(63,185,80,0.15); color: var(--low); }
+.badge-verdict { background: rgba(88,166,255,0.1); color: var(--accent); }
+.badge-engine { background: rgba(139,148,158,0.15); color: var(--text2); }
+.badge-status-ok { background: rgba(63,185,80,0.15); color: var(--low); }
+.badge-status-fix { background: rgba(210,153,34,0.15); color: var(--medium); }
+.badge-status-unfix { background: rgba(248,81,73,0.15); color: var(--high); }
+.badge-status-works { background: rgba(139,148,158,0.15); color: var(--text2); }
+.date-note { font-size: 11px; color: var(--text2); margin-left: auto; }
+
+.card-body { font-size: 13px; line-height: 1.7; color: var(--text2); }
+.card-body .label { color: var(--text); font-weight: 500; }
+.card-body .symptom, .card-body .root-cause, .card-body .workaround { background: var(--bg3); padding: 8px 10px; border-radius: 4px; margin: 6px 0; font-size: 12px; white-space: pre-wrap; overflow-y: auto; }
+.card-body .symptom { border-left: 3px solid var(--high); max-height: 120px; }
+.card-body .root-cause { border-left: 3px solid var(--medium); max-height: 100px; }
+.card-body .workaround { border-left: 3px solid var(--low); max-height: 150px; }
+.card-sources { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.source-link { color: var(--accent); text-decoration: none; font-size: 11px; background: var(--bg3); padding: 2px 8px; border-radius: 4px; display: inline-block; transition: background 0.15s; }
+.source-link:hover { background: rgba(88,166,255,0.15); }
+.card-expand { display: none; margin-top: 10px; }
+.card.open .card-expand { display: block; }
+.card-toggle { cursor: pointer; user-select: none; }
+.card-toggle::before { content: "▶ "; font-size: 10px; color: var(--text2); display: inline-block; }
+.card.open .card-toggle::before { content: "▼ "; }
+.empty { text-align: center; padding: 60px 20px; color: var(--text2); font-size: 14px; }
+
+.detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
+.detail-overlay.show { display: flex; }
+.detail-panel { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; max-width: 720px; width: 100%; padding: 24px; position: relative; }
+.detail-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text2); font-size: 24px; cursor: pointer; }
+.detail-close:hover { color: var(--text); }
+.detail-section { margin: 14px 0; }
+.detail-section h3 { font-size: 13px; color: var(--accent); margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <button class="theme-toggle" id="themeToggle" title="切换主题">🌓</button>
+    <h1><span>⚡</span> HF 模型问题速查 <small style="font-size:13px;color:var(--text2);font-weight:400">Model Pitfall Lookup</small></h1>
+    <p>HF Discussions · 推理引擎 GitHub Issues · Reddit · Agent 框架 交叉验证的真实问题条目 · 每日自动更新</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <input type="text" class="search-box" id="searchBox" placeholder="搜索模型名、问题现象、原因、引擎...">
+  <div class="filter-group" id="severityFilters">
+    <button class="filter-btn active" data-sev="all">全部</button>
+    <button class="filter-btn" data-sev="high">高危</button>
+    <button class="filter-btn" data-sev="medium">中危</button>
+    <button class="filter-btn" data-sev="low">低危</button>
+  </div>
+  <div class="filter-group" id="statusFilters">
+    <button class="filter-btn active" data-stat="all">全部</button>
+    <button class="filter-btn" data-stat="已修复">已修复</button>
+    <button class="filter-btn" data-stat="有缓解方案">有缓解方案</button>
+    <button class="filter-btn" data-stat="未修复">未修复</button>
+  </div>
+  <select class="sort-select" id="sortSelect">
+    <option value="updated">最近更新优先</option>
+    <option value="severity-date">按严重程度排序</option>
+    <option value="created">最新收录优先</option>
+    <option value="model">按模型名排序</option>
+  </select>
+</div>
+
+<div class="main">
+  <div class="family-tabs" id="familyTabs"></div>
+  <div class="cat-tabs" id="catTabs"></div>
+  <div class="card-grid" id="cardGrid"></div>
+  <div class="empty" id="emptyState" style="display:none">没有找到匹配的问题条目</div>
+</div>
+
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel">
+    <button class="detail-close" id="detailClose">&times;</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<script>
+// 主题：localStorage 记忆，默认跟随系统
+(function() {
+  const saved = localStorage.getItem('mp-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = cur ? (cur === 'dark' ? 'light' : 'dark') : (sysDark ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('mp-theme', next);
+  });
+})();
+
+const NEW_DAYS = 7; // 近 N 天收录的条目标 NEW
+let ALL_DATA = [];
+
+// 数据与页面彻底分离：只走 fetch，由每日自动化更新 data/*.json
+async function loadData() {
+  const files = ['qwen.json', 'cn-models.json', 'intl-models.json', 'general.json'];
+  for (const f of files) {
+    try {
+      const resp = await fetch('data/' + f);
+      if (resp.ok) ALL_DATA = ALL_DATA.concat(await resp.json());
+    } catch(e) { console.warn('Failed to load ' + f, e); }
+  }
+  init();
+}
+
+let state = { search: '', severity: 'all', status: 'all', family: 'all', category: 'all', sort: 'updated' };
+
+function init() {
+  renderStats();
+  renderFamilyTabs();
+  renderCatTabs();
+  renderCards();
+  bindEvents();
+}
+
+function isNew(d) {
+  if (!d.created_at) return false;
+  const days = (Date.now() - new Date(d.created_at).getTime()) / 86400000;
+  return days <= NEW_DAYS;
+}
+
+function renderStats() {
+  const families = new Set(ALL_DATA.map(d => d.family)).size;
+  const engines = new Set(ALL_DATA.map(d => d.engine)).size;
+  const verified = ALL_DATA.filter(d => d.confidence === 'high').length;
+  const newCount = ALL_DATA.filter(isNew).length;
+  document.getElementById('stats').innerHTML = `
+    <span class="stat"><strong>${ALL_DATA.length}</strong> 条问题</span>
+    <span class="stat"><strong>${families}</strong> 个模型家族</span>
+    <span class="stat"><strong>${engines}</strong> 个推理引擎</span>
+    <span class="stat"><strong>${verified}</strong> 条高置信度</span>
+    <span class="stat stat-new"><strong>${newCount}</strong> 条近 ${NEW_DAYS} 天新增</span>
+  `;
+}
+
+function renderFamilyTabs() {
+  const families = ['all', ...new Set(ALL_DATA.map(d => d.family))];
+  document.getElementById('familyTabs').innerHTML = families.map(f =>
+    `<button class="family-tab ${f === 'all' ? 'active' : ''}" data-family="${f}">${f === 'all' ? '全部模型' : f}</button>`
+  ).join('');
+}
+
+function renderCatTabs() {
+  const categories = ['all', ...new Set(ALL_DATA.map(d => d.category))];
+  document.getElementById('catTabs').innerHTML = categories.map(c =>
+    `<button class="cat-tab ${c === 'all' ? 'active' : ''}" data-cat="${c}">${c}</button>`
+  ).join('');
+}
+
+function getFilteredData() {
+  let data = [...ALL_DATA];
+  if (state.search) {
+    const q = state.search.toLowerCase();
+    data = data.filter(d =>
+      (d.model || '').toLowerCase().includes(q) ||
+      (d.symptom || '').toLowerCase().includes(q) ||
+      (d.rootCause || '').toLowerCase().includes(q) ||
+      (d.workaround || '').toLowerCase().includes(q) ||
+      (d.engine || '').toLowerCase().includes(q) ||
+      (d.quant || '').toLowerCase().includes(q) ||
+      (d.id || '').toLowerCase().includes(q)
+    );
+  }
+  if (state.severity !== 'all') data = data.filter(d => d.severity === state.severity);
+  if (state.status !== 'all') data = data.filter(d => d.status === state.status);
+  if (state.family !== 'all') data = data.filter(d => d.family === state.family);
+  if (state.category !== 'all') data = data.filter(d => d.category === state.category);
+
+  const sevOrder = { high: 0, medium: 1, low: 2 };
+  if (state.sort === 'updated') {
+    data.sort((a, b) => -(a.updated_at || '').localeCompare(b.updated_at || '') || (sevOrder[a.severity] ?? 3) - (sevOrder[b.severity] ?? 3));
+  } else if (state.sort === 'created') {
+    data.sort((a, b) => -(a.created_at || '').localeCompare(b.created_at || ''));
+  } else if (state.sort === 'severity-date') {
+    data.sort((a, b) => (sevOrder[a.severity] ?? 3) - (sevOrder[b.severity] ?? 3) || -(a.updated_at || '').localeCompare(b.updated_at || ''));
+  } else if (state.sort === 'model') {
+    data.sort((a, b) => (a.model || '').localeCompare(b.model || ''));
+  }
+  return data;
+}
+
+function statusBadge(status) {
+  const map = { '已修复': 'badge-status-ok', '有缓解方案': 'badge-status-fix', '未修复': 'badge-status-unfix', '存疑': 'badge-status-works' };
+  return `<span class="badge ${map[status] || 'badge-status-works'}">${status || 'unknown'}</span>`;
+}
+
+function renderCards() {
+  const data = getFilteredData();
+  const grid = document.getElementById('cardGrid');
+  const empty = document.getElementById('emptyState');
+  if (data.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = data.map(d => `
+    <div class="card" data-id="${d.id}">
+      <div class="card-header">
+        <div class="card-model">${esc(d.model)} <span class="quant">${d.variant ? esc(trunc(d.variant, 80)) : ''}</span></div>
+      </div>
+      <div class="badge-row" style="margin-bottom:8px">
+        ${isNew(d) ? '<span class="badge badge-new">NEW</span>' : ''}
+        <span class="badge severity-${d.severity}">${d.severity === 'high' ? '🔴 高危' : d.severity === 'medium' ? '🟡 中危' : '🟢 低危'}</span>
+        <span class="badge badge-verdict">${esc(d.verdict)}</span>
+        <span class="badge badge-engine">${esc(d.engine)}</span>
+        <span class="badge badge-engine">${esc(d.quant)}</span>
+        ${statusBadge(d.status)}
+        <span class="date-note">更新 ${esc(d.updated_at || d.created_at || '')}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-toggle card-summary">${esc(trunc(d.symptom, 160))}</div>
+      </div>
+      <div class="card-expand">
+        ${d.rootCause ? `<div class="root-cause"><span class="label">🔍 根因：</span>${esc(d.rootCause)}</div>` : ''}
+        ${d.workaround ? `<div class="workaround"><span class="label">🛠️ 解决方案：</span>${esc(d.workaround)}</div>` : ''}
+        ${d.fixedIn ? `<div style="margin-top:6px;font-size:12px;color:var(--low)">✅ 已在 ${esc(d.fixedIn)} 修复</div>` : ''}
+        ${d.engineVersion ? `<div style="margin-top:4px;font-size:11px;color:var(--text2)">📦 涉及引擎版本：${esc(d.engineVersion)}</div>` : ''}
+        <div class="card-sources">
+          ${(d.sources || []).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener" class="source-link">${esc(trunc(s.title || s.url, 50))}</a>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function trunc(s, n) { return s.length > n ? s.slice(0, n) + '...' : s; }
+
+function bindEvents() {
+  let searchTimer;
+  document.getElementById('searchBox').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { state.search = e.target.value; renderCards(); }, 200);
+  });
+  document.getElementById('severityFilters').addEventListener('click', e => {
+    if (!e.target.classList.contains('filter-btn')) return;
+    document.querySelectorAll('#severityFilters .filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    state.severity = e.target.dataset.sev;
+    renderCards();
+  });
+  document.getElementById('statusFilters').addEventListener('click', e => {
+    if (!e.target.classList.contains('filter-btn')) return;
+    document.querySelectorAll('#statusFilters .filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    state.status = e.target.dataset.stat;
+    renderCards();
+  });
+  document.getElementById('familyTabs').addEventListener('click', e => {
+    if (!e.target.classList.contains('family-tab')) return;
+    document.querySelectorAll('.family-tab').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    state.family = e.target.dataset.family;
+    renderCards();
+  });
+  document.getElementById('catTabs').addEventListener('click', e => {
+    if (!e.target.classList.contains('cat-tab')) return;
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    state.category = e.target.dataset.cat;
+    renderCards();
+  });
+  document.getElementById('sortSelect').addEventListener('change', e => {
+    state.sort = e.target.value;
+    renderCards();
+  });
+  document.getElementById('cardGrid').addEventListener('click', e => {
+    const card = e.target.closest('.card-toggle');
+    if (card) { card.closest('.card').classList.toggle('open'); return; }
+    const cardEl = e.target.closest('.card');
+    if (cardEl) openDetail(cardEl.dataset.id);
+  });
+  document.getElementById('detailClose').addEventListener('click', () => {
+    document.getElementById('detailOverlay').classList.remove('show');
+  });
+  document.getElementById('detailOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+  });
+}
+
+function openDetail(id) {
+  const d = ALL_DATA.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('detailContent').innerHTML = `
+    <div style="font-size:18px;font-weight:600;margin-bottom:4px">${esc(d.model)}</div>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:12px">${esc(d.variant)}</div>
+    <div class="badge-row" style="margin-bottom:16px">
+      ${isNew(d) ? '<span class="badge badge-new">NEW</span>' : ''}
+      <span class="badge severity-${d.severity}">${d.severity === 'high' ? '🔴 高危' : d.severity === 'medium' ? '🟡 中危' : '🟢 低危'}</span>
+      <span class="badge badge-verdict">${esc(d.verdict)}</span>
+      <span class="badge badge-engine">${esc(d.engine)}</span>
+      <span class="badge badge-engine">${esc(d.quant)}</span>
+      ${statusBadge(d.status)}
+    </div>
+    <div class="detail-section"><h3>⚠️ 症状表现</h3><div style="white-space:pre-wrap;font-size:13px;line-height:1.7;background:var(--bg3);padding:10px;border-radius:4px;border-left:3px solid var(--high)">${esc(d.symptom)}</div></div>
+    ${d.rootCause ? `<div class="detail-section"><h3>🔍 根因分析</h3><div style="white-space:pre-wrap;font-size:13px;line-height:1.7;background:var(--bg3);padding:10px;border-radius:4px;border-left:3px solid var(--medium)">${esc(d.rootCause)}</div></div>` : ''}
+    ${d.workaround ? `<div class="detail-section"><h3>🛠️ 解决方案</h3><div style="white-space:pre-wrap;font-size:13px;line-height:1.7;background:var(--bg3);padding:10px;border-radius:4px;border-left:3px solid var(--low)">${esc(d.workaround)}</div></div>` : ''}
+    ${d.fixedIn ? `<div class="detail-section" style="padding:10px;background:var(--bg3);border-radius:6px;border-left:3px solid var(--low)"><h3 style="color:var(--low)">✅ 修复状态</h3><p>已在 <strong>${esc(d.fixedIn)}</strong> 修复</p></div>` : ''}
+    ${d.engineVersion ? `<div class="detail-section"><h3>📦 涉及引擎版本</h3><p style="font-size:13px">${esc(d.engineVersion)}</p></div>` : ''}
+    ${d.sources && d.sources.length ? `<div class="detail-section"><h3>📎 来源</h3><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${d.sources.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px;background:var(--bg3);padding:4px 10px;border-radius:4px;border:1px solid var(--border)">${esc(trunc(s.title || s.url, 60))}<span style="margin-left:4px;font-size:10px;color:var(--text2)">[${esc(s.type)}]</span></a>`).join('')}</div></div>` : ''}
+    <div style="margin-top:12px;font-size:11px;color:var(--text2)">置信度: ${d.confidence === 'high' ? '高' : d.confidence === 'medium' ? '中' : '低'} | ID: ${esc(d.id)} | 收录: ${esc(d.created_at || '')} | 更新: ${esc(d.updated_at || '')}</div>
+  `;
+  document.getElementById('detailOverlay').classList.add('show');
+}
+
+loadData();
+</script>
+</body>
+</html>

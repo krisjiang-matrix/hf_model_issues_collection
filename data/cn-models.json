@@ -1,0 +1,642 @@
+[
+  {
+    "id": "cn-001",
+    "model": "MiniMax-M2.7",
+    "variant": "unsloth/MiniMax-M2.7-GGUF (UD-Q4_K_S / UD-Q4_K_M / UD-Q4_K_XL / UD-Q5_K_S / MXFP4_MOE)",
+    "family": "MiniMax",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "",
+    "category": "量化质量",
+    "symptom": "用 llama-perplexity 跑 PPL 评测时，从 chunk 32 开始输出变成 nan（ppl = nan）；ubergarm 仓库讨论中用户描述为 \"It turned into nans after [32]\"，ik_llama.cpp 的 --validate-quants 检查不出问题，CPU-only 后端与 Vulkan 后端不复现，仅 CUDA 后端路径复现。",
+    "rootCause": "blk.61.ffn_down_exps 张量在 Q4_K / Q5_K 下数值溢出。Unsloth 定位到该层，llama.cpp 主线的 q4_K mmq CUDA kernel 路径是嫌疑点（社区在 ubergarm 讨论中倾向于 CUDA backend 的 q4_K mmq kernel），但确切成因官方称未完全确定（\"we still do not know the exact cause - it could be a fluke, or most likely large multiplies causing overflows\"）。",
+    "workaround": "把 blk.61.ffn_down_exps 上提到 Q6_K 重新量化（Unsloth 与 AesSedai 采用此修复；llama.cpp master 已内置对 minimax-m2 架构的 blk.61.ffn_down_exps → Q6_K override，可用 --tensor-type-file 显式覆盖）。避开受影响的档位：IQ4_XS / IQ3_XXS 等 I-quant 与更低 bit 的 Q2_K_XL 不 NaN，中档 Q4_K_XL / Q5_K_S 会炸；bartowski 版本 10/26 个量化档 PPL 出现 NaN，AesSedai 的 Q4_K_M 因 NaN 已删库重传。",
+    "status": "已修复",
+    "fixedIn": "2026-04-15 重新上传修复后的 GGUF；llama.cpp master 内置 Q6_K override",
+    "severity": "high",
+    "verdict": "量化问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "MiniMax-2.7 GGUF Investigation + Fixes + Benchmarks",
+        "url": "https://huggingface.co/unsloth/MiniMax-M2.7-GGUF/discussions/8",
+        "type": "hf-discussion",
+        "date": "2026-04-15"
+      },
+      {
+        "title": "ubergarm/MiniMax-M2.7-GGUF · 4 bpw suggestions（社区复现与 CUDA 后端定位）",
+        "url": "https://huggingface.co/ubergarm/MiniMax-M2.7-GGUF/discussions/1",
+        "type": "hf-discussion",
+        "date": "2026-04-13"
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-002",
+    "model": "多模型（GLM-5.1 / MiniMax-M2.7 / Gemma 4 等全部 GGUF）",
+    "variant": "任意 <4bit 动态量化 GGUF（UD-IQ4_XS、UD-Q3_K_XL、IQ3_S 等）",
+    "family": "多厂商",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "CUDA 13.2 编译的构建",
+    "category": "静默降质",
+    "symptom": "用 CUDA 13.2 编译的 llama.cpp 跑低 bit 量化，输出变成乱码 / 思考段变成垃圾文本，且没有任何报错（静默降质）。Gemma 4、GLM-5.1 的 tool calling 会直接坏掉。Unsloth 称 30+ 用户确认降到 CUDA 13.1 及以下即恢复。",
+    "rootCause": "NVIDIA CUDA 13.2 编译器本身的问题导致 llama.cpp 部分量化 kernel 产生错误结果（NVIDIA 已确认在查）。非 Unsloth GGUF 特有问题，也非模型问题。",
+    "workaround": "降级到 CUDA 13.1 或更低（含 CUDA 12.x）；或使用 Unsloth 预编译的 CUDA 13.0 二进制（https://github.com/unslothai/llama.cpp/releases/tag/b8746）；或回退到 llama.cpp commit 009a1133268d040a7c574a7b9c95413b0be369a9（PR #19378 之前）。也可临时改用 Unsloth Studio / Ollama / LM Studio 等不依赖 CUDA 13.2 的前端。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "环境问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "Do NOT use CUDA 13.2（Unsloth 官方置顶警告）",
+        "url": "https://huggingface.co/unsloth/GLM-5.1-GGUF/discussions/4",
+        "type": "hf-discussion",
+        "date": "2026-04-09"
+      },
+      {
+        "title": "Dynamic Quants producing garbage thinking output (llama.cpp + Cuda 13 issue)",
+        "url": "https://huggingface.co/unsloth/MiniMax-M2.7-GGUF/discussions/1",
+        "type": "hf-discussion",
+        "date": "2026-04-12"
+      },
+      {
+        "title": "Compile bug: CUDA 13.2 breaks some quants (IQ3_S) · Issue #21255",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/21255",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "Unsloth issue 4849（CUDA 13.2 破坏 4bit 以下量化，已通知 NVIDIA）",
+        "url": "https://github.com/unslothai/unsloth/issues/4849",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-003",
+    "model": "GLM-5 / GLM-4.7",
+    "variant": "zai-org/GLM-5-FP8（vLLM nightly，开启 MTP 投机解码）",
+    "family": "GLM",
+    "quant": "FP8",
+    "engine": "vLLM",
+    "engineVersion": "vLLM nightly / 0.16.0rc2（0.15.0 正常）",
+    "category": "tool call 损坏",
+    "symptom": "开启 MTP 后 tool call 的 JSON 参数被截断或出现重复 token，客户端报 \"Invalid input for tool tavily_tavily_search: JSON parsing failed: Text: {\\\"query\\\":\\\"...\\\". Error message: JSON Parse error: Expected '}'\"；Claude Code 中报 \"invalid tool parameters\"。OpenCode 表现为反复解析失败与重试循环。",
+    "rootCause": "vLLM 近期版本在 MTP 投机解码下的 rejection sampler 回归：rejection_sampler.py 只比较 token IDs，导致结构化输出（JSON）出现重复/畸形 token。非 GLM 模型问题——同一 nightly 下 GLM-4.7 也复现，而 vLLM 0.15.0 + MTP 正常。",
+    "workaround": "去掉 MTP 相关启动参数：--speculative-config.method mtp 与 --speculative-config.num_speculative_tokens 1（代价是 H200 上生成变慢）。或回退到 vLLM 0.15.0。社区反馈 vLLM PR #31930 可能已修复该问题。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "2026-02",
+    "sources": [
+      {
+        "title": "[Bug]: GLM-5-FP8 malformed tool calls · Issue #34449",
+        "url": "https://github.com/vllm-project/vllm/issues/34449",
+        "type": "github-issue",
+        "date": "2026-02-12"
+      },
+      {
+        "title": "[Bug] Malformed tool-call JSON via NVIDIA NIM (GLM-5) causes parser failures in OpenCode · Issue #15",
+        "url": "https://github.com/zai-org/GLM-5/issues/15",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-02-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-004",
+    "model": "GLM-5.1",
+    "variant": "zai-org/GLM-5.1 / GLM-5.1-FP8（vLLM 或 SGLang 部署 + tool calling）",
+    "family": "GLM",
+    "quant": "多种",
+    "engine": "多引擎",
+    "engineVersion": "",
+    "category": "chat template",
+    "symptom": "模型完全看不到工具返回结果，反复重新发起同一个 tool call，陷入死循环。例如工具返回 \" 349 poetry.txt\"，模型却回答 \"I'm getting 276 bytes from wc -c\"；追问时模型说 \"the tool call responses have been coming back as empty\"。",
+    "rootCause": "vLLM/SGLang 会按 OpenAI Chat Completions 规范把 tool message 的 content 从字符串归一化成数组 [{\"type\":\"text\",\"text\":\"...\"}]，而 GLM-5.1 的旧 chat_template.jinja 只处理字符串格式。此外 GLM-5.1 模板还错误地遍历 m.content 并把 tool 的 function schema（tool_to_json(tool)）渲染进 prompt，而不是渲染 tr.output。",
+    "workaround": "把 chat_template.jinja 替换为 HF 仓库最新版本（https://huggingface.co/zai-org/GLM-5.1/blob/main/chat_template.jinja），无需改启动命令。模板修复要点是把工具结果段改成 {{ tr.output if tr.output is defined else tr }}。若更新后仍重复调用，官方要求新开 issue（注意：开启 MTP 后仍有 JSON 异常属另一条链路，见 cn-003）。",
+    "status": "已修复",
+    "fixedIn": "2026-04-16 官方发布更新版 chat_template.jinja",
+    "severity": "high",
+    "verdict": "模型本身问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "GLM-5.1 Tool Calling Bug Fix — Chat Template Update Required（官方置顶）",
+        "url": "https://huggingface.co/zai-org/GLM-5.1/discussions/26",
+        "type": "hf-discussion",
+        "date": "2026-04-16"
+      },
+      {
+        "title": "Tool call issues on vLLM · zai-org/GLM-5.1-FP8 discussions #1",
+        "url": "https://huggingface.co/zai-org/GLM-5.1-FP8/discussions/1",
+        "type": "hf-discussion",
+        "date": "2026-04-07"
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-005",
+    "model": "GLM-5",
+    "variant": "GLM-5-FP8（SGLang 部署）",
+    "family": "GLM",
+    "quant": "FP8",
+    "engine": "SGLang",
+    "engineVersion": "SGLang（GLM-5 / glm5-hopper 镜像）",
+    "category": "采样参数",
+    "symptom": "请求里传 custom_params={\"thinking_budget\": 100} 完全不生效，reasoning_content 照常完整输出，思考长度无法约束，长任务下思考 token 失控推高成本与延迟。",
+    "rootCause": "GLM-5 换了 tokenizer 词表，思考标签的 special token ID 变了：<think> 由 151350 变为 154841，</think> 由 151351 变为 154842。SGLang 现有的 Glm4MoeThinkingBudgetLogitProcessor 沿用旧 ID，导致 ThinkingBudgetLogitProcessor.__call__ 里 THINKING_START_TOKEN_ID not in cur_ids 恒为真，预算逻辑被整段跳过（静默失败，不报错）。",
+    "workaround": "使用新增的 Glm5ThinkingBudgetLogitProcessor（THINKING_START_TOKEN_ID=154841，THINKING_END_TOKEN_ID=154842，NEW_LINE_TOKEN_ID=198），见 sgl-project/sglang PR #20275；或自行实现 CustomLogitProcessor 继承 ThinkingBudgetLogitProcessor 并覆盖这三个 ID。",
+    "status": "有缓解方案",
+    "fixedIn": "PR #20275（该 issue 因 90 天无活动于 2026-05-10 被 bot 自动关闭）",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-03",
+    "sources": [
+      {
+        "title": "[Bug] thinking_budget not working for GLM-5 models due to mismatched token IDs · Issue #20274",
+        "url": "https://github.com/sgl-project/sglang/issues/20274",
+        "type": "github-issue",
+        "date": "2026-03-10"
+      },
+      {
+        "title": "Add Glm5ThinkingBudgetLogitProcessor for GLM-5 thinking budget support · PR #20275",
+        "url": "https://github.com/sgl-project/sglang/pull/20275",
+        "type": "github-pr",
+        "date": "2026-03-10"
+      }
+    ],
+    "created_at": "2026-03-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-006",
+    "model": "DeepSeek-V4-Flash",
+    "variant": "deepseek-ai/DeepSeek-V4-Flash（全 DSV4 家族）",
+    "family": "DeepSeek",
+    "quant": "BF16",
+    "engine": "vLLM",
+    "engineVersion": "vLLM ≥ 0.20.2 且 transformers ≥ 4.57",
+    "category": "加载失败",
+    "symptom": "启动即崩：AttributeError: 'DeepseekV4Config' object has no attribute 'compress_ratios'. Did you mean: 'compress_rates'? 报错发生在 multiproc worker 的 EngineCore init 阶段，最终表现是 Engine core initialization failed。",
+    "rootCause": "两侧版本错配：vLLM 的 vllm/model_executor/models/deepseek_v4.py:960 直接读 config.compress_ratios[layer_id]（旧格式，每层一个 int）；而 transformers ≥ 4.57 在 DeepseekV4Config.__init__ 里把该字段归一化成 layer_types（字符串列表）+ compress_rates（dict），原属性不再暴露。映射关系为 compress_ratios[i] = compress_rates.get(layer_types[i], 0)。",
+    "workaround": "在 import vLLM 之前 monkey-patch DeepseekV4Config.__init__，从 layer_types + compress_rates 重新推导 compress_ratios（issue 内已给出可直接用的补丁代码）；或把 transformers 锁在 4.57 以下；或等 vLLM 读取归一化字段（相关 PR：#42836 / #43443 / #44031）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "[Bug]: DeepSeek V4 model fails to load with transformers ≥ 4.57 — compress_ratios attribute removed · Issue #42741",
+        "url": "https://github.com/vllm-project/vllm/issues/42741",
+        "type": "github-issue",
+        "date": "2026-05-15"
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-007",
+    "model": "DeepSeek-V4 / V4-Flash",
+    "variant": "官方 API deepseek-v4-flash（thinking 模式默认开启）",
+    "family": "DeepSeek",
+    "quant": "其他",
+    "engine": "Agent框架",
+    "engineVersion": "",
+    "category": "tool call 损坏",
+    "symptom": "第二轮对话直接 400：{\"error\":{\"message\":\"The reasoning_content in the thinking mode must be passed back to the API.\",\"type\":\"invalid_request_error\"}}。凡是客户端不把上一轮 assistant 消息里的 reasoning_content 原样回传，多轮就断。",
+    "rootCause": "V4 默认开启 thinking 模式，每条 assistant 响应都带 reasoning_content 字段，DeepSeek API 要求客户端在下一次请求的 messages 中原样回传该字段；多数客户端（Wave Terminal 等）的请求构造器不会保留它。",
+    "workaround": "在客户端/网关里把每轮 assistant 消息的 reasoning_content 原样回填到下一轮 messages 的 assistant message 中（OpenCode issue #24190、opencode #18415 等同类修复）；或在 agent 框架中为该模型标记 requires_reasoning_content_roundtrip=true。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "模型本身问题",
+    "confidence": "medium",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "[Bug]: DeepSeek V4 fails with \"reasoning_content must be passed back to the API\" in multi-turn conversations · Issue #3266",
+        "url": "https://github.com/wavetermdev/waveterm/issues/3266",
+        "type": "github-issue",
+        "date": "2026-05-01"
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-008",
+    "model": "DeepSeek-V4",
+    "variant": "官方 API（thinking 模式）",
+    "family": "DeepSeek",
+    "quant": "其他",
+    "engine": "Agent框架",
+    "engineVersion": "",
+    "category": "tool call 损坏",
+    "symptom": "V4 的 API 似乎永远处于 thinking 模式，导致 tool_choice=\"required\" 和指定 function 的 tool_choice 被直接拒绝（400），结构化输出全线失效：LangChain with_structured_output 报 400，复杂 agent 场景下约 40% 请求退化成自由文本而拿不到结构化结果。",
+    "rootCause": "设计取舍而非纯 bug：tool_choice=\"required\" 要求模型在推理之前就做出承诺，而 thinking 模型把「要不要调工具、调哪个」当作推理过程的一部分。DeepSeek 官方 Oh My Pi 集成指南确认了这一限制，但主 API 文档未写明。",
+    "workaround": "为该模型建立 capability 表：supports_tool_choice=false（不发 tool_choice），同时 requires_reasoning_content_roundtrip=true，仍用 function calling 绑定 schema；在系统提示中显式要求「只调用一个工具、不要用散文回答」；对返回结果做 validate→repair 重试轮（把校验错误回灌让模型重发一次 tool call），可在不依赖 tool_choice 的情况下挽回多数退化。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "模型本身问题",
+    "confidence": "medium",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "[BUG] DeepSeek V4 rejects tool_choice=\"required\" and specific function tool_choice — breaks structured output in all agent frameworks · Issue #1376",
+        "url": "https://github.com/deepseek-ai/DeepSeek-V3/issues/1376",
+        "type": "github-issue",
+        "date": "2026-05-30"
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-009",
+    "model": "MiniMax-M2",
+    "variant": "MiniMaxAI/MiniMax-M2（OpenAI 兼容 function calling）",
+    "family": "MiniMax",
+    "quant": "BF16",
+    "engine": "vLLM",
+    "engineVersion": "vLLM（2026-01 前后）",
+    "category": "tool call 损坏",
+    "symptom": "只要工具参数的 description 里含括号（例如 \"The complete command to execute (e.g. ls -la, ssh user@host, cat file.txt)\"），Jinja2 模板渲染失败，服务端直接崩，客户端看到 \"Connection error\"，而不是一个可读的报错。",
+    "rootCause": "MiniMax-M2 的 HF chat template 渲染 tools 对象时没有正确转义特殊字符，括号/引号导致 Jinja2 渲染失败。",
+    "workaround": "使用 vLLM PR #33087 引入的 MiniMax M2 专用工具模板（新增 _MODEL_TYPE_TO_TOOL_CHAT_TEMPLATE 注册表 + template_minimax_m2.jinja，用 tojson filter 序列化 tools），该模板会在传 tools 时自动生效；临时方案是手动把参数 description 里的括号等字符清理掉，或自行用 tojson 渲染 tools。",
+    "status": "已修复",
+    "fixedIn": "vLLM PR #33087（对应 issue #32827）",
+    "severity": "medium",
+    "verdict": "组合问题",
+    "confidence": "medium",
+    "date": "2026-01",
+    "sources": [
+      {
+        "title": "[Bugfix][Tool Parser] Fix crash when parameter description contains parentheses · PR #33087",
+        "url": "https://github.com/vllm-project/vllm/pull/33087",
+        "type": "github-pr",
+        "date": "2026-01-26"
+      }
+    ],
+    "created_at": "2026-01-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-010",
+    "model": "MiniMax-M2.x / M2.7",
+    "variant": "lukealonso/MiniMax-M2.7-NVFP4（vLLM + FlashInfer）",
+    "family": "MiniMax",
+    "quant": "NVFP4",
+    "engine": "vLLM",
+    "engineVersion": "vLLM > 0.18.1 且 flashinfer > 0.6.7",
+    "category": "静默降质",
+    "symptom": "agent 会话生成文本里随机出现字符注入：在 token/词边界插入数字 \"1\"、\"0\"，在 tool call 的文件路径里最明显——期望 .../profile/ImapMail/imap.mail.example.com/INBOX，实际得到 .../1profile/1ImapMail/1imap.1mail.1example.1com/INBOX。后果是路径错误 → tool call 失败 → 重试循环 → 产生一堆垃圾目录和临时文件。",
+    "rootCause": "vLLM >0.18.1 配合 flashinfer >0.6.7 在 MiniMax M2.x 的 tool call 上有字符插入回归（eugr/spark-vllm-docker#208）。另有一个混淆因素：客户端不传采样参数时行为不稳，MiniMax 模型卡推荐 temperature=1.0 / top_p=0.95 / top_k=40。",
+    "workaround": "升级到 vLLM ≥ 0.20.1（NGC 26.06 镜像里的 0.22.1 已带修复）。同时在客户端固定采样参数 temp=1.0、top_p=0.95、top_k=40（或用 --override-generation-config 在服务端固定）。冒烟测试建议用带标点的文件名做 tool call（如 Windows.Application/plan_test-runner.md）作为该 bug 类的探针。注意该症状与 CUDA 13.2 引起的乱码（cn-002）高度相似，需先排除后者。",
+    "status": "已修复",
+    "fixedIn": "vLLM ≥ 0.20.1",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "MiniMax M2.7 NFVP4 Recipe & Benchmarks（Phase 3: the garbled-output bug）",
+        "url": "https://forums.developer.nvidia.com/t/minimax-m2-7-nfvp4-recipe-benchmarks/366324",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-011",
+    "model": "MiniMax-M2",
+    "variant": "lukealonso/MiniMax-M2-NVFP4（--tool-call-parser minimax_m2）",
+    "family": "MiniMax",
+    "quant": "NVFP4",
+    "engine": "vLLM",
+    "engineVersion": "vLLM 0.14.0rc1.dev162+gdecc24476（RTX PRO 6000 Blackwell）",
+    "category": "tool call 损坏",
+    "symptom": "设置 --stream-interval 20 后，SSE 流里每个 tool call 的 arguments 都变成空对象：{\"function\":{\"arguments\":\"{}\",\"name\":\"filesystem_repos__ListDir\"}}，下游执行报 \"must have required property 'dir'\"，连续 50+ 轮全部失败。改回 --stream-interval 1 即完全正常。",
+    "rootCause": "vLLM v1 的 output_processor.py 在 stream_interval > 1 时缓冲 token，但 tool call 的 arguments token 在 tool call 被 emit 之前没有正确累积，只保留住了 function name，参数被丢弃。",
+    "workaround": "把 --stream-interval 保持为默认值 1（不要在启用 tool calling 时调大它）。该 bug 与模型/parser 无关，gpt-oss-120b + openai parser 同样复现。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2025-12",
+    "sources": [
+      {
+        "title": "[Bug]: --stream-interval > 1 causes tool call arguments to be empty/lost · Issue #31501",
+        "url": "https://github.com/vllm-project/vllm/issues/31501",
+        "type": "github-issue",
+        "date": "2025-12-29"
+      }
+    ],
+    "created_at": "2025-12-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-012",
+    "model": "Kimi K2 Thinking",
+    "variant": "moonshotai/Kimi-K2-Thinking（native tool calls，OpenAI Compatible provider）",
+    "family": "Kimi / Moonlight",
+    "quant": "INT4",
+    "engine": "Agent框架",
+    "engineVersion": "Roo Code 3.34.2",
+    "category": "循环重复",
+    "symptom": "模型明明发出了 write_to_file 的 native tool call 并成功写入（用户能看到 Test.md 被创建并写入 \"Test\"），但它看不到工具输出、认为结果为空，于是一遍遍重新发起同一调用，直到 Roo Code 因循环而中止。",
+    "rootCause": "Roo Code 没有把 native tool call 的输出追加回消息历史（甚至可能整条带 native tool call 的消息被丢弃），模型看到的是空结果，因此不断重试。另一条已知相关链路是 Chutes.AI provider 未适配 Kimi K2 的 tool call 格式（Roo Code issue #9366 / PR #9368）。",
+    "workaround": "确认 agent 框架会正确回传 native tool call 的 result；Chutes.AI provider 需使用 KimiToolCallParser（PR #9368 已合入）。按官方 tool_call_guidance.md 配置 provider；为长任务设置 reflection 预算、超时与 step 检查点，避免无限重试循环。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "",
+    "sources": [
+      {
+        "title": "[BUG] Kimi K2 Thinking native tool calls do not work in Roo Code · Issue #9551",
+        "url": "https://github.com/RooCodeInc/Roo-Code/issues/9551",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "fix: add support for Kimi K2 tool call format in Chutes.AI provider · PR #9368",
+        "url": "https://github.com/RooCodeInc/Roo-Code/pull/9368",
+        "type": "github-pr",
+        "date": "2025-11-18"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-013",
+    "model": "Kimi-Linear-48B-A3B-Instruct",
+    "variant": "社区 GGUF（KDA / Kimi Delta Attention 架构）",
+    "family": "Kimi / Moonlight",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "主线 llama.cpp（KDA 支持合入前）",
+    "category": "静默降质",
+    "symptom": "用标准 llama.cpp 构建加载 Kimi Linear 的 GGUF，能跑起来但输出完全是垃圾：提示 1+1= 得到 \"1+1=ongongongongongongongongongongongongongongongongongongongong\"。",
+    "rootCause": "Kimi Linear 用的是 KDA（Kimi Delta Attention）混合线性注意力架构，3:1 的 KDA:MLA 配比，主线 llama.cpp 当时尚未实现 KDA/MLA 混合层，注意力层计算错误。",
+    "workaround": "必须使用带 KDA 支持的构建：社区早期方案是编译 llama.cpp PR #17592 分支，或等待主线支持 kimi_linear 架构。注意该模型训练上下文为 1M，启动时务必显式指定 --ctx-size（如 8192），否则 llama.cpp 会按 1M 上下文分配 KV cache，在低内存机器上卡死或崩溃。",
+    "status": "已修复",
+    "fixedIn": "llama.cpp 主线支持 kimi_linear 架构（早期需 PR #17592 分支）",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "2025-11",
+    "sources": [
+      {
+        "title": "Feature Request: Kimi Linear model (Kimi Delta Attention) · Issue #16930",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/16930",
+        "type": "github-issue",
+        "date": "2025-11-26"
+      },
+      {
+        "title": "Kimi-Linear-48B-Instruct-GGUF（模型卡注明需 PR #17592 构建）",
+        "url": "https://huggingface.co/AaryanK/Kimi-Linear-48B-A3B-Instruct-GGUF",
+        "type": "model-card",
+        "date": ""
+      }
+    ],
+    "created_at": "2025-11-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-014",
+    "model": "Hunyuan 混元 dense 系列",
+    "variant": "Tencent-Hunyuan/Hunyuan-1.8B-Instruct 等 v1 dense 模型",
+    "family": "混元 Hunyuan",
+    "quant": "BF16",
+    "engine": "vLLM",
+    "engineVersion": "vLLM（2025-09 前后主线）",
+    "category": "加载失败",
+    "symptom": "加载直接失败：RuntimeError: No HunYuanMoE layer found in model.layers.，栈停在 vllm/model_executor/models/hunyuan_v1.py:950 的 __init__。",
+    "rootCause": "vLLM 模型支持文件更新后引入了回归，不再正确处理 Hunyuan v1 dense 变体的架构（dense 模型没有 MoE 层），旧版本可正常推理。",
+    "workaround": "升级到包含修复的 vLLM 版本（PR #25354 已合入）；临时方案是在 config.json 里确认 architectures 指向 dense 实现，或回退到回归引入前的 vLLM 版本。启动命令参考：python3 -m vllm.entrypoints.openai.api_server --model Tencent-Hunyuan/Hunyuan-1.8B-Instruct --trust-remote-code。",
+    "status": "已修复",
+    "fixedIn": "vLLM PR #25354（2025-09-30 合入）",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2025-09",
+    "sources": [
+      {
+        "title": "[Bugfix][Model] Fix inference for Hunyuan dense models · PR #25354",
+        "url": "https://github.com/vllm-project/vllm/pull/25354",
+        "type": "github-pr",
+        "date": "2025-09-21"
+      }
+    ],
+    "created_at": "2025-09-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-015",
+    "model": "Hy-MT2-7B（混元翻译模型）",
+    "variant": "tencent/Hy-MT2-7B-GGUF（Q8_0）",
+    "family": "混元 Hunyuan",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "LM Studio（llama.cpp 后端）",
+    "category": "长上下文退化",
+    "symptom": "在 16K 上下文下做结构化字幕翻译（要求输出 [TRANSLATE_0]...[/TRANSLATE_0] 这类带索引标签）时发生结构性退化：技术标签里混进西里尔字母（拉丁 T 被生成为西里尔 Т），导致下游正则完全失效；长批次末尾频繁漏掉闭合标签；流式 API 下 stop token 泄漏成可见文本；语义崩塌为逐字直译。降温度到 0.2 只降低频率、不能消除。",
+    "rootCause": "腾讯官方回复：该模型最大支持 8K 上下文，长文本下性能与指令遵循能力确实会下降，属于已知待优化项，非量化问题（复现用的是近无损的 Q8_0）。",
+    "workaround": "把单次输入控制在 8K 上下文以内；把长批次拆成更小的 chunk；不要让输出依赖严格的结构化标签，改在下游做后处理/校验与补齐闭合标签；把 stop token 显式加入 stop strings。等官方后续版本优化长文本能力。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "模型本身问题",
+    "confidence": "medium",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "Formatting degradation and token corruption when handling structured tags (SRT translation use-case)",
+        "url": "https://huggingface.co/tencent/Hy-MT2-7B-GGUF/discussions/3",
+        "type": "hf-discussion",
+        "date": "2026-05-22"
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-016",
+    "model": "Hunyuan-A13B-Instruct",
+    "variant": "官方 Docker 镜像（docker.cnb.cool/tencent/hunyuan/hunyuan-a13b:hunyuan-moe-A13B-vllm）",
+    "family": "混元 Hunyuan",
+    "quant": "FP8",
+    "engine": "vLLM",
+    "engineVersion": "镜像内置 vLLM + FlashInfer",
+    "category": "加载失败",
+    "symptom": "在 CUDA 12.8 + H20 上启动官方镜像报 ValueError: Unknown CUDA arch (12.0+PTX) or GPU not supported。单独 import torch, flashinfer 后调用 torch.utils.cpp_extension._get_cuda_arch_flags() 可复现同样报错。",
+    "rootCause": "镜像用 FlashInfer 加速 vLLM，FlashInfer 触发的 torch 架构预设表检查不认识 12.0+PTX 这种写法，尽管环境本身是支持的。",
+    "workaround": "显式设置目标架构环境变量：export TORCH_CUDA_ARCH_LIST=\"9.0\"（H20 为 9.0，A100 为 8.0，可用 torch.cuda.get_device_capability() 查询自己显卡的架构号）。",
+    "status": "已修复",
+    "fixedIn": "用户侧设置 TORCH_CUDA_ARCH_LIST 即可",
+    "severity": "low",
+    "verdict": "环境问题",
+    "confidence": "medium",
+    "date": "2025-07",
+    "sources": [
+      {
+        "title": "Tencent-Hunyuan/Hunyuan-A13B-Instruct 魔搭反馈：vllm部署报错(ValueError: Unknown CUDA arch (12.0+PTX) or GPU not supported)",
+        "url": "https://www.modelscope.cn/models/Tencent-Hunyuan/Hunyuan-A13B-Instruct/feedback/issueDetail/36127",
+        "type": "official",
+        "date": "2025-07-08"
+      }
+    ],
+    "created_at": "2025-07-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-017",
+    "model": "ERNIE-4.5-VL-28B-A3B-PT",
+    "variant": "baidu/ERNIE-4.5-VL-28B-A3B-PT",
+    "family": "ERNIE 文心",
+    "quant": "BF16",
+    "engine": "vLLM",
+    "engineVersion": "vLLM 0.9.2rc2.dev78 / 0.9.2",
+    "category": "加载失败",
+    "symptom": "加载远程代码时抛 ModuleNotFoundError: No module named 'transformers_modules.baidu.ERNIE-4' / No module named 'transformers_modules.ERNIE-4.5-VL-28B-A3B-PT'，栈停在 processing_ernie_45t_vl.py 第 46 行的相对导入 from .tokenization_ernie_45t_vl import Ernie4_5_VLTokenizer。",
+    "rootCause": "transformers 的动态模块加载机制对缓存目录名的处理问题——模型 ID 中的点号（ERNIE-4.5-...）导致动态包路径被错误切分，相对导入找不到模块。同类问题在 InternLM 上也有报告（InternLM#756）。",
+    "workaround": "重新从 HF Hub 下载模型（多数情况下清掉旧的 transformers_modules 缓存即可恢复）；若使用本地模型，确保最内层目录名不含 \".\" 符号；必要时降低/升级 transformers 版本以避开该动态加载路径。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "2025-07",
+    "sources": [
+      {
+        "title": "[Bug]: No module named 'transformers_modules.baidu.ERNIE-4 launching with vLLM 0.9.2rc2.dev · Issue #20654",
+        "url": "https://github.com/vllm-project/vllm/issues/20654",
+        "type": "github-issue",
+        "date": "2025-07-09"
+      }
+    ],
+    "created_at": "2025-07-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-018",
+    "model": "ERNIE-4.5-VL（Ernie4_5_VLMoe）",
+    "variant": "baidu/ERNIE-4.5-VL-28B-A3B-PT",
+    "family": "ERNIE 文心",
+    "quant": "BF16",
+    "engine": "vLLM",
+    "engineVersion": "vLLM + transformers v5（5.5.0 测试）",
+    "category": "加载失败",
+    "symptom": "初始化报 KeyError: \"Missing required keys in `rope_parameters` for 'rope_type'='default': {'rope_theta'}\"，AutoConfig.from_pretrained 阶段即失败。",
+    "rootCause": "transformers v5 在 PretrainedConfig.__init__() 里通过 __class_validators__ 增加严格的 RoPE 校验，要求 rope_theta 出现在 rope_parameters 中；而 Ernie-4.5 的模型 config 是在 super().__init__() 之后才给 rope_theta 赋值（值为 500000），因此校验时该键缺失。",
+    "workaround": "应用 vLLM PR #38747 / #39180 的修复（在 Ernie4_5_VLMoeForConditionalGenerationConfig 上加 verify_and_update_model_config，先 set_default_rope_theta(500000) 再让 transformers 校验；或在 patch_rope_parameters() 里把 config.rope_theta 传播进 config.rope_parameters）。临时方案：回退到 transformers v4，或手动在 config.json 的 rope_parameters 中补上 rope_theta: 500000。",
+    "status": "有缓解方案",
+    "fixedIn": "vLLM PR #38747（对应 issue #38735）",
+    "severity": "medium",
+    "verdict": "组合问题",
+    "confidence": "medium",
+    "date": "",
+    "sources": [
+      {
+        "title": "[Transformers v5] Fix Ernie4_5_VLMoeForConditionalGeneration rope_theta config · PR #38747",
+        "url": "https://github.com/vllm-project/vllm/pull/38747",
+        "type": "github-pr",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-019",
+    "model": "DeepSeek-V4-Flash",
+    "variant": "mlx-community/DeepSeek-V4-Flash-2bit-DQ（Apple MLX）",
+    "family": "DeepSeek",
+    "quant": "GGUF",
+    "engine": "其他",
+    "engineVersion": "mlx-lm（Apple Silicon）",
+    "category": "循环重复",
+    "symptom": "长文本/开放式生成时随机退化为复读机式重复 token。使用者做了完整的采样参数扫描（temperature、top_p、top_k、min_p、repetition_penalty、repetition_context_size），没有任何设置能修复，部分设置反而更糟；temp=0.6 只是减轻。",
+    "rootCause": "2-bit DQ 检查点本身的量化精度下限（stochastic degeneration），不是运行时 bug，也不是使用者的配置问题。同一讨论中另一个独立问题（长生成时 KV cache materialize 触发 OOM）已定位并向上游提交修复。",
+    "workaround": "换用更高精度量化（4-bit）。但该模型的 4-bit 版本超过 128GB，在 128GB 统一内存的机器上装不下——也就是说在此 2-bit 构建上，长文本循环无法通过设置规避，只能接受或换硬件/换档位。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "量化问题",
+    "confidence": "medium",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "KeyError: 'deepseek_v4' · mlx-community/DeepSeek-V4-Flash-2bit-DQ discussions #1",
+        "url": "https://huggingface.co/mlx-community/DeepSeek-V4-Flash-2bit-DQ/discussions/1",
+        "type": "hf-discussion",
+        "date": "2026-05"
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-020",
+    "model": "MiniMax-M1",
+    "variant": "MiniMaxAI/MiniMax-M1-40k / M1-80k（hybrid Lightning Attention MoE）",
+    "family": "MiniMax",
+    "quant": "INT4",
+    "engine": "vLLM",
+    "engineVersion": "vLLM（需 V0 引擎）",
+    "category": "加载失败",
+    "symptom": "在 vLLM V1 引擎下启动失败：MiniMax-M1 model is not currently supported（或伴随 import vllm._C → ModuleNotFoundError: No module named 'vllm._C'）。",
+    "rootCause": "MiniMax-M1 的混合架构（Lightning Attention + MoE）当时只在 vLLM V0 引擎路径上实现，V1 引擎没有对应实现。",
+    "workaround": "启动时强制使用 V0 引擎并按官方参数部署：export SAFETENSORS_FAST_GPU=1; export VLLM_USE_V1=0，然后 python3 -m vllm.entrypoints.openai.api_server --model <path> --tensor-parallel-size 8 --trust-remote-code --quantization experts_int8 --max_model_len 4096 --dtype bfloat16。若报 vllm._C 缺失，从源码 pip install -e . 安装 vLLM，或把预编译的 *.so 与 vllm_flash_attn 目录拷进源码树。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "2025-06",
+    "sources": [
+      {
+        "title": "MiniMax-M1-80k · vllm_deployment_guide_cn.md（官方部署文档「常见问题」）",
+        "url": "https://huggingface.co/MiniMaxAI/MiniMax-M1-80k/blob/main/docs/vllm_deployment_guide_cn.md",
+        "type": "official",
+        "date": "2025-06"
+      },
+      {
+        "title": "Efficient Support for the MiniMax-M1 Hybrid Architecture in vLLM（vLLM 官方博客）",
+        "url": "https://github.com/vllm-project/vllm-project.github.io/pull/59",
+        "type": "blog",
+        "date": "2025-06-26"
+      }
+    ],
+    "created_at": "2025-06-01",
+    "updated_at": "2026-09-03"
+  }
+]

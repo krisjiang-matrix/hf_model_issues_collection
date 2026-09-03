@@ -1,0 +1,780 @@
+[
+  {
+    "id": "qwen-001",
+    "model": "Qwen3.6-27B",
+    "variant": "Lorbus/Qwen3.6-27B-int4-AutoRound（GGUF/量化仓库：lorbus 版 int4-AutoRound，W4G128 / W4A16，含 MTP head）",
+    "family": "Qwen",
+    "quant": "AutoRound",
+    "engine": "vLLM",
+    "engineVersion": "nightly（v0.19.x 系，单 RTX 3090，max_model_len=125000）",
+    "category": "循环重复",
+    "symptom": "TurboQuant KV 预设（turboquant_3bit_nc / turboquant_4bit_nc / turboquant_k8v4）与任意投机解码（MTP 或 ngram）同时开启时，凡是需要结构化或精确输出的任务全部退化为 token 循环：1) tool-call prompt 循环，<tool_call> 被当纯文本吐出，tool_calls[] 永远为空；2) 长上下文 needle-in-haystack 只取到 secret 第一个 token 然后循环（如 'amber amber amber...'、'turqururur...'，10K–90K 深度均复现）；3) 流式偶发 'Wait, I I I I I...'。短叙述/代码补全看起来正常，所以早期 benchmark 能通过。隔离矩阵：MTP 单独开（fp8_e5m2 KV）全通过；TurboQuant 单独开（不投机解码）全通过；只有组合才失败。num_speculative_tokens=1 和 3 都失败。",
+    "rootCause": "MTP draft head 会对实时 KV cache 再跑一次 attention。KV 经 TurboQuant（rotate → quantize → pack）存取后，draft head 的 attention 分布在 rare-token / structured-token 上下文上坍缩；draft 步与 verify 步读的是同一份 TurboQuant 反量化后的 cache，噪声分布一致，所以循环的 draft 被静默接受。短/常见 token 生成不受影响，因此与 PR #38479（在 Qwen3-4B 上只测吞吐+GSM8K+NIAH）不冲突。",
+    "workaround": "二选一，均已验证：1) 把 --kv-cache-dtype 从 turboquant_3bit_nc 换成 fp8_e5m2（保留 MTP，全部测试通过，当前默认）；2) 保留 turboquant_3bit_nc 但删除 --speculative-config 整块（7 项 verify-full.sh 全部恢复正确，代价是 800 词写作 bench 的 TPS 从约 85 降到约 40）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "[Bug]: TurboQuant KV × any speculative decoding (MTP or ngram) produces degenerate token loops — confirmed across dense and hybrid attention",
+        "url": "https://github.com/vllm-project/vllm/issues/40831",
+        "type": "github-issue",
+        "date": "2026-04-25"
+      },
+      {
+        "title": "[Tracking issue]: TurboQuant/HIGGS Attention follow-ups",
+        "url": "https://github.com/vllm-project/vllm/issues/40069",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-002",
+    "model": "Qwen3.6-27B",
+    "variant": "Lorbus int4-AutoRound（Qwen3-Next hybrid dense，DeltaNet + attention）",
+    "family": "Qwen",
+    "quant": "AutoRound",
+    "engine": "vLLM",
+    "engineVersion": "nightly / v0.19.2rc1.dev134（SHA fe9c3d6c5）",
+    "category": "加载失败",
+    "symptom": "TurboQuant KV + 投机解码 + chunked-prefill 三者同时开启时，CUDA graph capture 在 continuation-prefill 路径崩溃：query_start_loc.tolist() 处报地址不匹配 / tolist() 报错，服务根本起不来。这是 #40831（输出质量 bug）的前置门槛——必须先绕过该崩溃才能观察到循环问题。评论中另有报告称根因是 _continuation_prefill 内一处 torch.empty 发生在 profile_run 之后，vLLM 的 KV sizing 从未为它预留空间。",
+    "rootCause": "profiler 不可见的 torch.empty 分配发生在 profile_run 结束之后；capture 时 flash_attn_varlen_func 需要的两个 int32 (cu_seqlens) scratch 张量尚不存在，导致 tolist() 地址不匹配。",
+    "workaround": "社区补丁树（Patch 23 = cu_seqlens scratch 预分配到 _ensure_on_device；Patch 44 = _tq_mixed_attn_out_buf capture-safe 复用；Patch 22/P38 = 共享 dequant + 持久化 4-D K/V workspace）。已验证配置：2× RTX A5000 (SM 8.6)，Qwen3-Next-35B-A3B-FP8 与 -AWQ，单消息 258,528 token 上下文一次通过，254K 处 needle 召回正确。另可参考 github.com/noonghunna/qwen36-27b-single-3090 的 compose 与 bench。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "[Bug]: TurboQuant KV + spec-decode + chunked-prefill crashes CUDA graph capture at query_start_loc.tolist() in continuation-prefill path (Qwen3-Next hybrid dense)",
+        "url": "https://github.com/vllm-project/vllm/issues/40807",
+        "type": "github-issue",
+        "date": "2026-04-25"
+      },
+      {
+        "title": "noonghunna/qwen36-27b-single-3090（复现仓库 + bench）",
+        "url": "https://github.com/noonghunna/qwen36-27b-single-3090",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-003",
+    "model": "Qwen3 / Qwen3.5 / Qwen3.6（全系）",
+    "variant": "BF16 原版及各量化版均受影响（parser 层问题，与权重精度无关）",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "v0.19.x – v0.24.x（--reasoning-parser qwen3）",
+    "category": "静默降质",
+    "symptom": "Qwen3.x reasoning parser 只检测特殊 tool_call_token_id，当模型以碎片化 text token 跨多个 delta 吐出 <think> 时，reasoning→content 边界提前触发，剩下的思维流整段泄漏进 content 字段；usage.reasoning_tokens 报 0。本地复现（commit 51adca74e）：向 /v1/responses 发一条在推理文本中包含字面量 <think> 的 prompt，reasoning 字段在句中被截断，其余思维流被路由进 content。开启 thinking 且生成中始终没有闭合 </think> 时，extract_reasoning() 会把整段生成当 reasoning、content 返回 None（v0.19.0 的 parser 默认 chat_kwargs.get('enable_thinking', True)，重写版把初始状态设为 reasoning）。",
+    "rootCause": "qwen3_reasoning_parser.extract_reasoning() 用 model_output.partition(end_token) 粗暴二分，缺少 is_reasoning_end 尾部窗口检测、transition 丢失恢复、token 计数与 raw-text tag 处理。",
+    "workaround": "1) 应用 vLLM PR #40783（ExtReMLapin 的 reasoning parser 重写：raw text tag、transition 丢失、end detection、token counting、withhold recovery）；镜像 ghcr.io/juanqui/vllm-qwen35-toolfix:0.19.1rc1.dev328-g18013df6a 已内置该 patch 集，或用 eugr 镜像的 build-and-copy.sh --apply-vllm-pr 40783；2) 若只需非思考输出，显式传 chat_template_kwargs={'enable_thinking': False}；3) 短期可用外部代理（如 qwen-toolcall-fixer）兜底。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "[Bugfix] Fix Qwen3 reasoning parser: raw text tags, transition loss, end detection, token counting, withhold recovery (PR #40783)",
+        "url": "https://github.com/vllm-project/vllm/pull/40783",
+        "type": "github-pr",
+        "date": ""
+      },
+      {
+        "title": "hec-ovi/vllm-qwen README — Known non-working paths（reasoning parser 段）",
+        "url": "https://awesome.ecosyste.ms/projects/github.com%2Fhec-ovi%2Fvllm-qwen",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "vLLM patch for Qwen3.5/3.6 tool-call & reasoning parser fixes (8 PRs + 1 local wire fix)",
+        "url": "https://gist.github.com/juanqui/ad80d1dcdfd69f4b3fb6f92c0e41e393",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Qwen3.5 Tool Calling finally fixed (possibly) — NVIDIA Developer Forums",
+        "url": "https://forums.developer.nvidia.com/t/qwen3-5-tool-calling-finally-fixed-possibly/366451",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-004",
+    "model": "Qwen3 / Qwen3.5 / Qwen3.6（全系，含 Coder）",
+    "variant": "BF16 原版及各量化版均受影响（tool-call parser 层问题）",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "v0.19.x（--tool-call-parser qwen3_coder / qwen3_xml）",
+    "category": "tool call 损坏",
+    "symptom": "两个 Qwen3 tool-call parser 在流式路径上有多处 bug：tag 被切分到不同 delta 之间导致解析失败；投机解码下 content tracking 漂移；交错的纯文本被吞掉；末尾 \\n 丢失（丢末尾换行会让下游严格 JSON 客户端直接报错）。对 agentic coding loop 伤害最大——模型反复吐 <tool_call>，parser 误分类会级联成 tool-arg 损坏。日常聊天与单轮 /v1/chat/completions 大多正常，所以很容易漏测。",
+    "rootCause": "qwen3coder_tool_parser.py 与 qwen3xml_tool_parser.py 的流式状态机没有处理 tag 跨 delta 分片，也没有在投机解码回滚时同步 previous_text。",
+    "workaround": "1) 应用 vLLM PR #40785（qwen3_coder 重写）与 PR #40787（qwen3_xml 重写），两者在记录时仍未合入；2) 需要立刻可用时改用 ghcr.io/juanqui/vllm-qwen35-toolfix 镜像，或按 juanqui gist 里的 patch 自行 cherry-pick 到 scripts/patch_strix；3) 纯文本 agentic 场景可改走 llama.cpp（独立 tool-call extractor，Qwen3.6 单/并行调用均验证干净，但 GGUF 不含 vision tower）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "vLLM PR #40785（qwen3_coder tool parser 重写）",
+        "url": "https://github.com/vllm-project/vllm/pull/40785",
+        "type": "github-pr",
+        "date": ""
+      },
+      {
+        "title": "vLLM PR #40787（qwen3_xml tool parser 重写）",
+        "url": "https://github.com/vllm-project/vllm/pull/40787",
+        "type": "github-pr",
+        "date": ""
+      },
+      {
+        "title": "hec-ovi/vllm-qwen README — Known non-working paths（tool-call parsers 段）",
+        "url": "https://awesome.ecosyste.ms/projects/github.com%2Fhec-ovi%2Fvllm-qwen",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "vLLM patch for Qwen3.5/3.6 tool-call & reasoning parser fixes (8 PRs + 1 local wire fix)",
+        "url": "https://gist.github.com/juanqui/ad80d1dcdfd69f4b3fb6f92c0e41e393",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-005",
+    "model": "Qwen3.6-35B-A3B",
+    "variant": "RedHatAI/Qwen3.6-35B-A3B-NVFP4（compressed-tensors / llm-compressor）",
+    "family": "Qwen",
+    "quant": "NVFP4",
+    "engine": "vLLM",
+    "engineVersion": "vllm/vllm-openai:cu130-nightly（v0.19.x）",
+    "category": "循环重复",
+    "symptom": "自部署 NVFP4 版出现两类问题：1) tool calling 损坏——若干 vLLM 回归 bug 由 streaming 触发，而 MTP 会触发 streaming（即使客户端关掉 streaming 也一样）；2) 循环——模型陷入自我重复，presence_penalty 与 repetition_penalty 最初都压不住。同一作者在后续文章补充：MTP '能跑得更好但经常导致循环'，presence penalty 几乎无用，repetition_penalty=1.1 才有明显改善；另外 FP8 量化模型上 DFlash 15 个投机 token 只有前 4 个被采纳，反而更慢。",
+    "rootCause": "作者推断：KV cache 量化引入的误差让模型对下一个 token '更不确定'，反而避免了锁死进循环（failed successfully 效应）；因此显式提高 repetition_penalty 能替代这层噪声。MTP 触发的 streaming 路径与 vLLM parser 回归叠加导致 tool call 损坏。",
+    "workaround": "可用配方：关闭 MTP（删除 --speculative-config）；--kv-cache-dtype 显式设 fp8（不要 auto，auto 可能落到 bf16）；--override-generation-config '{\"temperature\": 1.0, \"top_p\": 0.95, \"top_k\": 20, \"min_p\": 0.0, \"presence_penalty\": 0.0, \"repetition_penalty\": 1.1}'；配 froggeric/Qwen-Fixed-Chat-Templates 的增强 chat template（注意用最新版，旧版会让模型直接停住不生成）；或在外层加 harness，检测到坏 tool call 就带着正确格式提示让模型重试。另：不要同时设 VLLM_ENFORCE_STRICT_TOOL_CALLING=1 与 MTP（见 #44006 / PR #44297 的 FSM advance 失败）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "PSA: Hard lessons learned with Qwen3.6-35B-A3B",
+        "url": "https://blog.davidvassallo.me/2026/05/02/psa-hard-lessons-learned-with-qwen3-6-35b-a3b/",
+        "type": "blog",
+        "date": "2026-05-02"
+      },
+      {
+        "title": "Speculative decoding with Qwen 3.6-35B-A3B",
+        "url": "https://blog.davidvassallo.me/2026/05/15/speculative-decoding-with-qwen-3-6-35b-a3b/",
+        "type": "blog",
+        "date": "2026-05-15"
+      },
+      {
+        "title": "RedHatAI/Qwen3.6-35B-A3B-NVFP4 · Great quant!!（HF 讨论，MTP 与显存取舍）",
+        "url": "https://huggingface.co/RedHatAI/Qwen3.6-35B-A3B-NVFP4/discussions/6",
+        "type": "hf-discussion",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-006",
+    "model": "Qwen3.5 / Qwen3.6（35B-A3B、122B-A10B 等）",
+    "variant": "Qwen/Qwen3.5-35B-A3B-FP8，Qwen/Qwen3.6-35B-A3B（BF16 亦复现）",
+    "family": "Qwen",
+    "quant": "FP8",
+    "engine": "vLLM",
+    "engineVersion": "v0.19.0 起（仍存在于 v0.19.x / v0.20.x）",
+    "category": "tool call 损坏",
+    "symptom": "非流式路径下，若模型把 XML tool-call 写进了 <think> 块内部，HTTP 返回 200，reasoning 字段填满，content 为空，tool_calls 是空数组，没有任何异常或告警。agent loop 看到 finish_reason='stop' 且零 tool call，判定模型已结束，任务中途静默停止。实测影响面：Qwen3.5-35B-A3B-FP8、Qwen3.5-122B-A10B-FP8，且在 Claude Code 与 OpenCode 下随机中断（qwen3_coder 与 qwen3_xml 两个 parser 都中招）。vLLM issue #39056 于 2026-04-06 提交，到 2026-08-06 仍有 24 条评论未关闭。",
+    "rootCause": "qwen3_reasoning_parser 把 </think> 之前的全部内容划给 reasoning，而下游 tool 解析只检查 content 字段（vLLM 文档原文：'tool calling only parses functions from the content field, not from the reasoning'）；落在 reasoning 里的 <tool_call>...</tool_call> 永远到不了 qwen3_coder。两个行为各自正确、合起来致命。",
+    "workaround": "1) 注意两个广为流传但当前已失效/不对症的'修复'：从 v0.24.0 起 PR #45413 已把 qwen3_coder 与 qwen3_xml 合并成同一个 Qwen3EngineToolParser 类，切换 flag 是 no-op；升级到 v0.20.0 拿 PR #35687 也不覆盖本例（该 patch 显式 continue 跳过成对出现的 <tool_call>，#39056 的复现正是成对 tag）。2) 实际可用：升级到 v0.24.0+（PR #45413 的 parser 引擎重写，2026-06-29 发布）；3) 无法升级时用外层修复代理 github.com/czerwiakowskim/qwen-toolcall-fixer（OpenAI 协议兼容）；4) 有报告称改用 anthropic 协议端点与 vLLM 通信可绕开（Claude Code / OpenCode 均验证数天无问题）。",
+    "status": "有缓解方案",
+    "fixedIn": "v0.24.0（PR #45413，2026-06-29）",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "vLLM 0.19 may lose tool calls for Qwen/Qwen3.5-35B-A3B-FP8 when XML tool_call is emitted inside <think> (#39056)",
+        "url": "https://github.com/vllm-project/vllm/issues/39056",
+        "type": "github-issue",
+        "date": "2026-04-06"
+      },
+      {
+        "title": "Fix Qwen3.5 reasoning tool calls embedded inside think（PR #39055，未合入已关闭）",
+        "url": "https://github.com/vllm-project/vllm/pull/39055",
+        "type": "github-pr",
+        "date": "2026-04-06"
+      },
+      {
+        "title": "Empty tool_calls With reasoning_content: vLLM Parser Fix",
+        "url": "https://particula.tech/blog/empty-tool-calls-reasoning-content-vllm-parser",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Qwen/Qwen3.6-35B-A3B · Very buggy in vllm + opencode",
+        "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/discussions/40",
+        "type": "hf-discussion",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-007",
+    "model": "Qwen3.5-9B / Qwen3.6-35B-A3B",
+    "variant": "Qwen3.5-9B-AWQ；cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit（int4）",
+    "family": "Qwen",
+    "quant": "AWQ",
+    "engine": "多引擎",
+    "engineVersion": "vLLM（OpenWebUI MCP/RAG 场景；smallcode 客户端 vLLM/vllm-openai:latest）",
+    "category": "tool call 损坏",
+    "symptom": "开启 MTP 投机解码后，工具调用与 JSON 格式化随机失效。案例一：Qwen3.5 9B AWQ 在 vLLM 上开 MTP，OpenWebUI 里 MCP 与 RAG 随机报错，排查 9 小时后确认——关掉 MTP 立即全部恢复（同一环境 3.8 27B 开 MTP 稳定）。案例二：qwen3.6-35b-int4 走 smallcode 客户端报 JSONDecodeError: Expecting value: line 2 column 1 (char 1)，开不开 MTP 都一样，服务端日志显示 200 OK——原因是 Hermes parser 收到了未被剥离的 Qwen3 reasoning 块，不是合法 JSON。另有 vLLM 0.19 之后才出现、0.17 正常的回归报告。",
+    "rootCause": "两部分：1) MTP 理论上不改变输出文本，但在特定模型/客户端组合下会破坏下游解析（draft/verify 回滚让流式 delta 边界变化）；2) 未配 --reasoning-parser qwen3 时，<think> 原文直接进入 tool parser。",
+    "workaround": "1) 先关 MTP 做二分定位（这是最高性价比的第一步）；2) 必配三件套：--reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder（reasoning parser 在 tool parser 之前剥离思维块）；3) 若仍不稳，回退 vLLM 到 0.17.x（多位报告 0.18/0.19 引入回归）；4) 需要 MTP 时在外层加 tool call 校验/重试 harness。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "组合问题",
+    "confidence": "medium",
+    "date": "2026-05",
+    "sources": [
+      {
+        "title": "Cannot work with qwen3.6-35b-int4（smallcode #49，含 reasoning-parser 诊断与修复命令）",
+        "url": "https://github.com/Doorman11991/smallcode/issues/49",
+        "type": "github-issue",
+        "date": "2026-05-27"
+      },
+      {
+        "title": "Debugging: MTP enabled on Qwen 3.5 9B caused tool calling failures",
+        "url": "https://agihunt.info/en/p/1a04a5758fada99fb29e948f0f7",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "czerwiakowskim/qwen-toolcall-fixer（OpenAI 兼容的 tool call 修复代理）",
+        "url": "https://github.com/czerwiakowskim/qwen-toolcall-fixer",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-05-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-008",
+    "model": "Qwen3.6-35B-A3B / Qwen3.6-27B（GatedDeltaNet hybrid 全系）",
+    "variant": "BF16 原版与 GGUF 均有报告（llama.cpp 路径）",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "llama.cpp",
+    "engineVersion": "部分 llama.cpp 构建（clamp 未合入的版本）",
+    "category": "长上下文退化",
+    "symptom": "上下文超过约 80K token 后，模型陷入 tool-call 无限重复循环，典型现象是同一个 Read 调用带相同参数反复出现（'-> Read ... [limit=20]' 重复几十次），必须手动 kill 会话。短上下文完全正常，所以很容易误判成'模型长上下文能力差'而换模型。",
+    "rootCause": "src/models/delta-net-base.cpp 中 GatedDeltaNet 的累积门控和 g_cum 在取 exp 前缺 clamp。Python 参考实现为 g_last = torch.clamp(g_cum[:, :, -1], max=50.0).exp()，C++ 侧写成 g_cum[:, :, -1].exp()，超过约 80K token 后指数溢出，线性注意力的隐藏状态被整体破坏。",
+    "workaround": "1) 升级到已合入 clamp 的 llama.cpp nightly，用 git log 确认有 delta-net / GatedDeltaNet 相关提交；2) 未合入时手工打补丁：g_last = torch.clamp(g_cum[:, :, -1], max=50.0).exp() 且 g_diff = torch.clamp(g_cum[:, :, -1:] - g_cum, max=50.0).exp()（max=50.0 与 Python 参考一致，不要改）；3) 临时止血用 --repeat-penalty 1.1（代价是代码类任务质量约降 2-3%）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "low",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "Qwen 3.6 35B Hallucination Long Context: Fix It (2026)（GatedDeltaNet 累积衰减溢出 / 80K 墙章节）",
+        "url": "https://www.aiqnahub.com/qwen-3-6-35b-hallucination-long-context",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-009",
+    "model": "Qwen3.6-27B",
+    "variant": "unsloth/Qwen3.6-27B-GGUF（GGUF，general.architecture = qwen35）",
+    "family": "Qwen",
+    "quant": "GGUF",
+    "engine": "多引擎",
+    "engineVersion": "Transformers（含 vLLM 内嵌的 GGUF 加载路径）；Ollama 0.22.0",
+    "category": "加载失败",
+    "symptom": "HF Transformers 未注册 qwen35 这个 GGUF 架构名，加载被直接拒绝。Ollama 侧报错更明确：llama_model_loader 读出 general.architecture str = qwen35 后 'unable to load model'，api/generate 返回 500，ollama show 能正常列出参数（27B、262144 上下文、vision 能力）但 run 不起来。Ubuntu 24.04 + Ollama 0.22.0（ROCm/HIP 后端）与 RTX 5090 上均有相同报告。",
+    "rootCause": "Unsloth 的 GGUF 用简写 general.architecture = qwen35，而 Transformers / vLLM 的 GGUF 架构映射表只认 qwen3_5 之类，旧代码把 qwen35 判为 unknown 直接拒绝。",
+    "workaround": "1) Transformers 侧：给 GGUF 架构映射表打小补丁（hec-ovi 在 .tests/ 里有本地 hack）；2) vLLM 侧：把 GGUF 架构解析包 try/except，让它 fall through 到 override 路径，并注册 Qwen3_5ForCausalLM / Qwen3_5MoeForCausalLM（含 model_type → architecture 查表、uses_mrope() 对这些架构返回 False 并剥离 mrope_section/mrope_interleaved），参考 github.com/Kausik-A/qwen3.6-27b-mi50-vllm 的 patches/registry.py 与 patches/config.py；3) 换 llama.cpp（原生支持 qwen35）；4) Ollama 侧暂无解，改走 llama.cpp 或 LM Studio。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "unsloth/Qwen3.6-27B-GGUF · Cannot load Qwen 3.6 27B GGUF in Ollama (Unknown model architecture: 'qwen35')",
+        "url": "https://huggingface.co/unsloth/Qwen3.6-27B-GGUF/discussions/23",
+        "type": "hf-discussion",
+        "date": "2026-04-29"
+      },
+      {
+        "title": "hec-ovi/vllm-qwen README — Known non-working paths（Unsloth Qwen3.6-27B-GGUF 段）",
+        "url": "https://awesome.ecosyste.ms/projects/github.com%2Fhec-ovi%2Fvllm-qwen",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Kausik-A/qwen3.6-27b-mi50-vllm（GGUF 架构注册与 config 解析补丁说明）",
+        "url": "https://github.com/Kausik-A/qwen3.6-27b-mi50-vllm",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-010",
+    "model": "Qwen3.6-35B-A3B / Qwen3.6-27B",
+    "variant": "unsloth/Qwen3.6-35B-A3B-GGUF 等多模态 GGUF（需 mmproj 旁路文件）",
+    "family": "Qwen",
+    "quant": "GGUF",
+    "engine": "Ollama",
+    "engineVersion": "截至 2026-04 末的 Ollama 版本",
+    "category": "加载失败",
+    "symptom": "Qwen3.6 是多模态模型，GGUF 由主文件 + mmproj 视觉旁路文件组成。Ollama 的 loader 还不认 mmproj 旁路文件，即使只做纯文本推理也无法加载（近期 llama.cpp 构建同样要求提供 mmproj）。HF 上 'Use this model' 下拉里仍有 Ollama 选项，容易误导用户以为开箱可用。",
+    "rootCause": "Ollama 的模型加载器不支持独立的 vision projector sidecar 文件。",
+    "workaround": "1) 留在 Qwen3.5-35B-A3B 等 Ollama 已支持的版本，等 mmproj 支持落地；2) 改用 llama.cpp：huggingface-cli 同时下载主 GGUF 与 mmproj-F16.gguf，llama-server -m 主文件 --mmproj mmproj 文件；纯文本场景加 --no-mmproj 明确跳过；3) 或用 LM Studio / Unsloth Studio（近期版本原生处理 Qwen3.6 tool call）。注意 Qwen3.6 的 mmproj 与 Qwen3.5 不通用。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "Best Way to Run Qwen 3.6 35B MoE Locally: VRAM, Speed, Setup（Ollama is broken for 3.6 GGUFs 段）",
+        "url": "https://insiderllm.com/pdfs/best-way-run-qwen-3-6-35b-moe-locally.pdf",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Running Qwen3.6-27B Locally: Hardware, Quantization, and What Actually Works（Ollama 不支持段）",
+        "url": "https://www.neoteric.no/blog/running-qwen-3-6-27b-locally",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "unsloth/Qwen3.6-35B-A3B-GGUF · where is the mmproj ? or this one does not support vision",
+        "url": "https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/discussions/1",
+        "type": "hf-discussion",
+        "date": "2026-04-16"
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-011",
+    "model": "Qwen3.6-27B",
+    "variant": "Qwen/Qwen3.6-27B-FP8（W8A8 block-128 FP8）",
+    "family": "Qwen",
+    "quant": "FP8",
+    "engine": "vLLM",
+    "engineVersion": "vLLM 含 Triton w8a8 的构建",
+    "category": "加载失败",
+    "symptom": "启动时挂死在 init 阶段（hangs in init），进程不报错也不退出，无法进入推理。",
+    "rootCause": "vLLM 的 Triton w8a8 autotune 在 DeltaNet 的 48+48 分区划分下、配合 block-128 FP8 量化时卡住。报告环境本身是 RDNA 3.5，无硬件 FP8，即使不卡也会以 BF16 速度模拟，但卡死本身需要上游修复。",
+    "workaround": "1) 回避该 checkpoint，改用 BF16 或 GGUF/AutoRound 路径；2) 有 FP8 硬件时优先走 Marlin/FlashInfer 后端而非 Triton w8a8；3) 关注上游对 GDN 分区 + block-128 FP8 的 autotune 修复。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "组合问题",
+    "confidence": "medium",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "hec-ovi/vllm-qwen README — Known non-working paths（Qwen/Qwen3.6-27B-FP8 段）",
+        "url": "https://awesome.ecosyste.ms/projects/github.com%2Fhec-ovi%2Fvllm-qwen",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-012",
+    "model": "Qwen3.6-27B",
+    "variant": "Qwen/Qwen3.6-27B-FP8（DeepSeek 式 block FP8，weight_block_size [128,128]，dynamic activation）",
+    "family": "Qwen",
+    "quant": "FP8",
+    "engine": "vLLM",
+    "engineVersion": "vLLM 0.19.1 / 0.20.x（--quantization fp8 legacy Fp8Config）",
+    "category": "显存内存",
+    "symptom": "32GB 级显卡（RTX 5090）上，权重加载后仅剩约 1 GiB，warmup 阶段 OOM 或直接报 'No available memory for the cache blocks'。即使 gpu_memory_utilization 保守、max_num_seqs=4、max_model_len=4096、enforce_eager=true、kv_cache_dtype=fp8_e4m3 全部拉满也无法启动；另一处观测为 'Tried to allocate 272 MiB' 失败。",
+    "rootCause": "legacy Fp8Config 无法量化 lm_head（ParallelLMHead），lm_head 仍以 BF16 驻留（[248320, 5120] 约 2.37 GiB）。剩余空间不足以同时容纳 GDN 线性注意力 solve_tril kernel 的 Triton autotuner scratch 与 KV cache block 预留。早期测到的 'FP8-lm_head 只省 0.32 GiB' 其实是 Triton autotune 预算假象——scratch 吃掉了大部分权重侧差值。",
+    "workaround": "1) 把 lm_head 也量化成 block-FP8，可释放约 1.18 GiB（2.37 GiB → 1.18 GiB）；参考 inferRouter/Qwen3.6-27B-FP8-lmhead-fp8 与 vLLM PR #41000（FP8 ParallelLMHead opt-in，截至报告时未合入主线的 overlay 镜像 ENABLE_LM_HEAD_FP8=1）；2) 配合混合 TurboQuant KV（PR #39931）；3) 参考运行档（RTX 5090 32GB）：--language-model-only --quantization fp8 --kv-cache-dtype turboquant_k8v4 --gpu-memory-utilization 0.96 --max-model-len 5120 --max-num-seqs 3 --max-num-batched-tokens 15360 --enforce-eager --no-enable-chunked-prefill（保守档 turboquant_k8v4 / max_model_len=4096 / max_num_seqs=3；不要把 turboquant_4bit_nc 与 max_num_seqs=4 配在接近满上下文的流量上）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "[Feature][FP8] Opt-in ParallelLMHead quantization in legacy Fp8Config（vLLM #40999）",
+        "url": "https://github.com/vllm-project/vllm/issues/40999",
+        "type": "github-issue",
+        "date": "2026-04-27"
+      },
+      {
+        "title": "inferRouter/Qwen3.6-27B-FP8-lmhead-fp8（复现 checkpoint 与运行档）",
+        "url": "https://huggingface.co/inferRouter/Qwen3.6-27B-FP8-lmhead-fp8",
+        "type": "model-card",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-013",
+    "model": "Qwen3.6-35B-A3B / Qwen3.6-27B",
+    "variant": "unsloth GGUF 低比特档（UD-IQ4_XS、IQ3_S、IQ3_XXS、IQ2_M）；Bartowski / APEX 等各家低比特 GGUF 同受影响",
+    "family": "Qwen",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "llama.cpp b8815 及同期构建 + CUDA 13.2（driver/nvcc 13.2.51）",
+    "category": "量化质量",
+    "symptom": "4-bit 及以下 GGUF 在任何 provider 下都输出乱码/垃圾 token，且常以 'Aborted (core dumped)' 结束（例如 llama-cli -dev CUDA0 -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-IQ4_XS 直接 abort）。高比特档（Q5_K 及以上）正常，容易误判成量化档位本身有缺陷。",
+    "rootCause": "CUDA 13.2 的 cuBLAS 路径问题，不是 llama.cpp 也不是 Unsloth 的缺陷；NVIDIA 已在 13.3 修复。",
+    "workaround": "1) 降到 CUDA 13.1（CUDA 向后兼容，无需卸载 13.2，装一份 13.1 并让 llama.cpp 指向旧 toolkit 即可）；2) 直接用预编译二进制 github.com/unslothai/llama.cpp/releases/tag/b8811（CUDA 13.0 编译，可在 13.2 机器上运行）；3) 或改用 CUDA 12.8 / 13.0 构建。验证方式：先用 4-bit 以下档位跑一段纯文本，确认无乱码再放量。",
+    "status": "已修复",
+    "fixedIn": "CUDA 13.3（NVIDIA 侧）",
+    "severity": "high",
+    "verdict": "环境问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "unsloth/Qwen3.6-35B-A3B-GGUF · CUDA 13.2 causes gibberish for UD-IQ4_XS quant on llama.cpp (b8815/latest)",
+        "url": "https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/discussions/3",
+        "type": "hf-discussion",
+        "date": "2026-04-16"
+      },
+      {
+        "title": "unslothai/unsloth issue #4849（CUDA 13.2 损坏追踪）",
+        "url": "https://github.com/unslothai/unsloth/issues/4849",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "Run Qwen3.6 Locally with Unsloth GGUF（CUDA 13.2 受影响的 quant 清单）",
+        "url": "https://leetllm.com/blog/run-qwen36-local-unsloth-gguf",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-014",
+    "model": "Qwen3-Coder-Next / Qwen3.5-35B-A3B / Qwen3-Next 系（Hybrid GDN）",
+    "variant": "unsloth/Qwen3-Coder-Next-GGUF:UD-Q8_K_XL 等 GGUF；Qwen3.5-35B-A3B 亦复现",
+    "family": "Qwen",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "llama.cpp 2026 年多版本（涉及 PR #13194 的缓存路径）",
+    "category": "性能回退",
+    "symptom": "日志反复出现 'forcing full prompt re-processing due to lack of cache data (likely due to SWA or hybrid/recurrent memory)'，即使加了 --swa-full 也无效，缓存命中率接近 0。实测影响：Claude Code 里的一个任务从 20 分钟降到 2 分钟（修复后），即原本每轮都要重算整个 prompt。",
+    "rootCause": "Qwen3.5/Next 是混合架构（约 3/4 Gated Delta Network 层 + 1/4 全注意力层），Qwen 官方建议每轮结束后删掉历史 <think> 内容以防上下文膨胀。删除这些 token 会让序列位移，使 checkpoint 失效；而 GDN 的循环状态 S 是定长且路径依赖的（不像 KV cache 可以做前缀匹配），llama.cpp 找不到可恢复的有效 checkpoint，只能整段重算。",
+    "workaround": "1) Prompt 侧根治：不要每轮删除历史 thinking 内容——用 --chat-template-kwargs '{\"preserve_thinking\": true}' 或在模板层面停止剥离历史 <think>，checkpoint 即稳定，'forcing full prompt re-processing' 日志消失，命中率接近 100%；2) 引擎侧两个方向（讨论中提出、未见实现）：分层重算（checkpoint 部分有效时只重算循环/GDN 层，复用 attention 层 KV）；在已知会被丢弃的 token 边界预存 checkpoint。参考 llama.cpp PR #13194 与 issue #19794 的完整排查记录。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "[Bug] Qwen3-Coder-Next (Hybrid) Prompt Cache forces full re-processing due to 'invalidated context checkpoint' despite --swa-full（llama.cpp #19794）",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/19794",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "llama.cpp PR #13194（SWA / hybrid recurrent memory 缓存提示）",
+        "url": "https://github.com/ggml-org/llama.cpp/pull/13194",
+        "type": "github-pr",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-015",
+    "model": "Qwen3.5 / Qwen3.6（含 397B-A17B、27B、4B 等 GDN 混合架构）",
+    "variant": "BF16 原版与各量化版均受影响（CUDA graph capture 阶段）",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "vLLM 0.16.x – 0.19.x（causal_conv1d.py 断言存在期间）",
+    "category": "加载失败",
+    "symptom": "启动时 CUDA graph capture 阶段直接 AssertionError 崩溃，堆栈落在 vllm/model_executor/models/qwen3_next.py 的 _forward_core → causal_conv1d_update → vllm/model_executor/layers/mamba/ops/causal_conv1d.py: assert num_cache_lines >= batch。vLLM 官方 Qwen3.5/Qwen3.6 recipe 明确记录了这条报错。",
+    "rootCause": "num_cache_lines 是共享 conv_state 缓存池的大小（通常只有 4-6），不是 batch 维度；CUDA graph capture 时 batch 可达 512+，断言必然失败。",
+    "workaround": "1) 调低 --max-cudagraph-capture-size（默认 512，常见设 8 或更小；有报告在 Gemma4 分支上设 8 才起得来）；2) 上游正解是 vLLM PR #34571（PR #35946 的临时放宽方案已被作者关闭，理由是该问题由 #34571 解决）；3) 验证方式：vllm serve 后观察 CUDA graph capture 是否在约 8 秒内完成。",
+    "status": "已修复",
+    "fixedIn": "vLLM PR #34571",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-03",
+    "sources": [
+      {
+        "title": "Qwen3.5 & Qwen3.6 Usage Guide（vLLM 官方 recipes，含 assert num_cache_lines >= batch 报错与处置）",
+        "url": "https://github.com/vllm-project/recipes/blob/main/Qwen/Qwen3.5.md",
+        "type": "official",
+        "date": ""
+      },
+      {
+        "title": "Fix incorrect assertion in causal_conv1d_update for indexed conv_state（vLLM PR #35946，已关闭，指向 #34571）",
+        "url": "https://github.com/vllm-project/vllm/pull/35946",
+        "type": "github-pr",
+        "date": "2026-03-04"
+      },
+      {
+        "title": "vLLM PR #34571",
+        "url": "https://github.com/vllm-project/vllm/pull/34571",
+        "type": "github-pr",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-03-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-016",
+    "model": "Qwen3.6-27B / Qwen3.6-35B-A3B（hybrid 全系）",
+    "variant": "Qwen3.6-27B-FP8 等（含 397B 级 MoE 混合架构）",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "vLLM 0.26.x（提及 0.26.1rc1.dev / 0.27.1）",
+    "category": "性能回退",
+    "symptom": "开启 --enable-prefix-caching 后前缀缓存命中率静默掉到 0%，即每轮对话都走完整 cache-miss prefill 路径。确定性复现（Qwen3.8-27B hybrid GDN，int8 GPTQ/Marlin，prefix caching + chunked prefill + MTP k=3，fp8_e4m3 KV）：同一 prompt 连发 3 次，20K 12.80s → 12.94s（miss），40K 34.58s → 67.83s（miss，且比冷启动慢一倍），80K 161.10s → 174.99s（miss）。另一个非 CUDA 平台的独立复现（Qwen3.6-27B，mamba_cache_mode=align，--max-model-len 8192，4 条相同 2528-token prompt）显示投机解码也会触发同样的坍塌。",
+    "rootCause": "hybrid 注意力 block size 被对齐到覆盖 mamba page 的粗粒度（本例自动对齐到 1600，落在 528–2096 区间的粗端；另一例为 896），align 模式的 Mamba checkpoint 落在请求独有的 token 上，vllm/v1/core/kv_cache_coordinator.py 中对各组命中做交集时把命中整体清零。miss 需要约 3 次曝光才可能被判定为 common，而真实对话几乎不会重复完全相同的前缀。",
+    "workaround": "1) 加 --prefix-match-unit 400（必须是所有 KV cache group block size 的约数；512 会启动失败：Invalid prefix_match_unit=512; all KV cache group block sizes must be divisible by prefix_match_unit）。不能修掉 turn-2 miss，但能把最终命中的 TTFT 大致减半（40K 5.56s → 2.79s；20K 1.67s → 0.70s）。2) 权衡关闭投机解码或前缀缓存。3) 关注 vLLM #52527 / #52216 / #52897 的 checkpoint 策略改动。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "[Bug]: Hybrid-model prefix caching silently drops to 0% when the align-mode Mamba checkpoint lands in request-unique tokens（vLLM #45238）",
+        "url": "https://github.com/vllm-project/vllm/issues/45238",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-017",
+    "model": "Qwen3.6-35B-A3B / Qwen3.6-27B",
+    "variant": "社区 NVFP4 / INT8 量化版（nameistoken/Qwen3.6-35B-A3B-Quark-W8A8-INT8；AEON-7/Qwen3.6-35B-A3B-heretic-NVFP4）",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "vLLM main HEAD（530d3713…）及 2026-06 前后版本",
+    "category": "多模态异常",
+    "symptom": "启动时刷屏 WARNING [qwen3_5.py:435] Parameter visual.blocks.0.attn.proj.weight not found in params_dict, skip loading（visual.merger.*、visual.patch_embed.proj.weight、visual.pos_embed.weight 等同样），服务能起来、文本输出完全正常，但任何图片输入都返回垃圾（'!!!! garbage'）。因为只是 WARNING 不是 ERROR，极易被忽略。",
+    "rootCause": "量化时的 ignore 正则把视觉塔张量多嵌套了一层，存成 model.language_model.visual.*（语言模型的子节点），而 vLLM 的 Qwen3_5MoeForConditionalGeneration / Qwen3_5ForConditionalGeneration 期望的是同级的 model.visual.*。vLLM 于是静默 skip-load 整个 ViT，用未初始化的权重跑视觉编码。",
+    "workaround": "把量化 checkpoint 里视觉张量的键名从 model.language_model.visual.* 整体重命名为 model.visual.*（仅改 header，权重量化数据逐字节不变，无需重新量化），并同步更新 model.safetensors.index.json。AEON-7 的路径已按此修复并在 2026-06-18 重新上传（333 个张量，重拉权重即可；27B 兄弟版本本来就用正确的 model.visual.* 布局，不受影响）。HF 讨论里也提供了 header-only 修复脚本。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "量化问题",
+    "confidence": "high",
+    "date": "2026-06",
+    "sources": [
+      {
+        "title": "nameistoken/Qwen3.6-35B-A3B-Quark-W8A8-INT8 · Wrong vision tensor key namespace in the released checkpoint (model.language_model.visual.* vs model.visual.*)",
+        "url": "https://huggingface.co/nameistoken/Qwen3.6-35B-A3B-Quark-W8A8-INT8/discussions/2",
+        "type": "hf-discussion",
+        "date": ""
+      },
+      {
+        "title": "AEON-7/Qwen3.6-35B-A3B-heretic-NVFP4-DFlash（Vision fix 2026-06-18 章节）",
+        "url": "https://git.hubp.de/AEON-7/Qwen3.6-35B-A3B-heretic-NVFP4-DFlash",
+        "type": "blog",
+        "date": "2026-06-18"
+      }
+    ],
+    "created_at": "2026-06-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-018",
+    "model": "Qwen3.5 / Qwen3.6（9B、27B、35B-A3B、122B-A10B 等全部 qwen3_5 / qwen3_5_moe）",
+    "variant": "BF16 原版（Qwen/Qwen3.5-9B、Qwen/Qwen3.6-27B 等）",
+    "family": "Qwen",
+    "quant": "BF16",
+    "engine": "多引擎",
+    "engineVersion": "Transformers < 5.2.0 / vLLM 旧镜像 / NGC 25.11-py3 / HF Inference Endpoints 旧镜像",
+    "category": "加载失败",
+    "symptom": "vLLM 起服务时 ModelConfig 校验失败：Value error, The checkpoint you are trying to load has model type `qwen3_5` but Transformers does not recognize this architecture. This could be because of an issue with the checkpoint, or because your version of Transformers is out of date.（pydantic ValidationError）。Transformers 侧直接 KeyError: 'qwen3_5'。optimum 侧导出 ONNX 时报 KeyError: 'qwen3_5_moe' 以及 cannot import name 'get_parameter_dtype'。",
+    "rootCause": "Transformers 的 Qwen3.5 支持 PR 于 2026-02-09 合入，v5.2.0（2026-02）才带。大量 serving 镜像（HF Inference Endpoints 部分镜像仍是 Transformers 4.48.0、NGC 25.11-py3）与 vLLM 稳定版钉的 Transformers 版本都早于该时间点。optimum 稳定版还引用了 Transformers >= 5.0 已移除的符号。",
+    "workaround": "1) 首选换镜像 tag 而不是在容器内单独升级组件——NGC 标签钉的是 CUDA + vLLM + Transformers 版本矩阵，单独升级会破坏矩阵（案例：从 nvcr.io/nvidia/vllm:25.11-py3 换到 26.06-py3，vLLM 0.22.1 + Transformers 5.6.0）。2) vLLM 用 nightly / cu130-nightly 镜像，或升级 Transformers：pip install --upgrade transformers（需 >= 5.2.0，PyTorch 亦需 >= 2.4）。3) Qwen3.5 官方 recipe 建议 'until 0.17.0 is released use vLLM nightly'。4) ONNX 导出需 optimum 与 optimum-onnx 的 git 主分支，或临时给 TasksManager 注册 qwen3_5_moe 映射。",
+    "status": "已修复",
+    "fixedIn": "Transformers v5.2.0（2026-02）",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-02",
+    "sources": [
+      {
+        "title": "Qwen/Qwen3.5-9B · value error, The checkpoint you are trying to load has model type `qwen3_5`",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-9B/discussions/3",
+        "type": "hf-discussion",
+        "date": "2026-03-02"
+      },
+      {
+        "title": "Seeking Advice: Qwen3.5-27B failing on Inference Endpoints — Transformers 版本根因分析（HF Forums）",
+        "url": "https://discuss.huggingface.co/t/seeking-advice-qwen3-5-27b-failing-on-inference-endpoints-is-unsloth-gguf-a-viable-alternative-for-text-editing/173879",
+        "type": "hf-discussion",
+        "date": ""
+      },
+      {
+        "title": "Add ONNX export support for Qwen3.5/3.6 MoE (qwen3_5_moe) architecture（optimum #2425）",
+        "url": "https://github.com/huggingface/optimum/issues/2425",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "Owning Inference - Qwen3.6 on DGX Spark for real coding（NGC 镜像版本矩阵踩坑）",
+        "url": "https://www.devashish.me/p/owning-inference-qwen36-on-dgx-spark",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-02-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-019",
+    "model": "Qwen3.6-35B-A3B",
+    "variant": "FP8 / INT4 / NVFP4（含 distilled 版）各档均有报告；Claude Code、VS Code、自建 assistant 均复现",
+    "family": "Qwen",
+    "quant": "多种",
+    "engine": "多引擎",
+    "engineVersion": "vLLM Nightly / vLLM 0.20 / eugr（基于 nightly）",
+    "category": "循环重复",
+    "symptom": "反思阶段无限重复：模型生成一个大文件，完成后说'其实我不满意，换个写法重做'，反复多次；修 bug 时反复修同一处；更严重的是'反思 → 说同一句话 → 用相同参数调同一个工具 → 再反思'循环几十次直至无限。作者试遍所有 vLLM 版本和几乎所有 Qwen3.6 35B 变体（FP8、INT4、NVFP4，含/不含蒸馏），全部中招。最后看似稳定的配置是 {repetition_penalty: 1.1, temperature: 0.4}，但约 30k 上下文后仍开始重复；开不开 preserve_thinking 都一样。",
+    "rootCause": "未确定。跨多种量化格式、跨多种客户端复现，说明不是单一量化档位或单一引擎的问题，更接近模型在长 agentic 会话中的行为倾向（overthinking / 缺乏收敛信号）与引擎 parser 问题叠加。",
+    "workaround": "1) 采样侧：temperature 0.4–1.0 配 repetition_penalty 1.1（两处独立报告一致：presence_penalty 无效，repetition_penalty 有效）；2) 会话侧：控制在 30k 上下文以内，定期开新会话；3) 工程侧：必须配测试框架（Playwright / pytest），让模型用执行结果收敛而不是空转推理；4) 外层加循环检测（连续 N 次相同 tool call + 相同参数即打断并强制换策略），spiritbuun 的 hardened chat template 里就内置了 'retry stall escalation'。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "模型本身问题",
+    "confidence": "medium",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "Qwen/Qwen3.6-35B-A3B (and FP8) has landed — 无尽重复与 tool call XML 泄漏报告（NVIDIA Developer Forums）",
+        "url": "https://forums.developer.nvidia.com/t/qwen-qwen3-6-35b-a3b-and-fp8-has-landed/366822",
+        "type": "blog",
+        "date": "2026-04-29"
+      },
+      {
+        "title": "I Tested Every Solution for Qwen3.6-27B – overthinking 章节（建议配测试框架收敛）",
+        "url": "https://dredyson.com/i-tested-every-solution-for-qwen3-6-27b-heres-what-actually-works-a-complete-comparison-of-vllm-llama-cpp-mtp-fp8-awq-and-moe-configurations-with-benchmarks-pros-cons-and-deployment-recomm/",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "spiritbuun/buun-Qwen3.6-chat_template（retry stall escalation 等 25 项模板修复）",
+        "url": "https://huggingface.co/spiritbuun/buun-Qwen3.6-chat_template",
+        "type": "model-card",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "qwen-020",
+    "model": "Qwen3.6-27B",
+    "variant": "cyankiwi/Qwen3.6-27B-AWQ-INT4 与 cyankiwi/Qwen3.6-27B-AWQ-BF16-INT4（compressed-tensors AWQ W4A16）",
+    "family": "Qwen",
+    "quant": "AWQ",
+    "engine": "SGLang",
+    "engineVersion": "SGLang 0.5.14（lmsysorg/sglang:latest）",
+    "category": "加载失败",
+    "symptom": "首启直接崩溃：RuntimeError: Index put requires the source and destination dtypes match, got BFloat16 for the destination and Half for the source. 崩溃点在 GDN（Gated DeltaNet）线性注意力层的前向写入。",
+    "rootCause": "compressed-tensors 格式内部混合精度：config.json 写 torch_dtype: bfloat16，但部分权重张量以 FP16 存储。SGLang 初始化 GDN 的 conv_states 用了 BF16，前向输出却是 FP16，写入时 dtype 不匹配。",
+    "workaround": "启动时显式指定 --dtype bfloat16，强制统一到 BF16 后可正常加载（日志显示 type=Qwen3_5ForConditionalGeneration，quant=compressed-tensors，mem usage 19.05 GB，CUDA graph capture 正常）。注意日志里的 'Acceleration for non-quantized schemes is not supported by Compressed Tensors. Falling back to UnquantizedLinearMethod' 是正常信息，不是错误。另：若要在 vLLM 上用 MTP 投机解码，需换用把 mtp.* 张量替换回 BF16 的 graft 版本（hampsonw/Qwen3.6-27B-AWQ-BF16-INT4-mtp-bf16），因为 vLLM MTP 期望 mtp 模块是原始张量而非 compressed-tensors INT4 条目。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "量化问题",
+    "confidence": "medium",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "深度调优：SGLang 0.5.14 部署 Qwen3.6-27B 从失败到稳定的全程复盘",
+        "url": "https://www.toutiao.com/article/7660794812290859560",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "cyankiwi/Qwen3.6-27B-AWQ-INT4",
+        "url": "https://huggingface.co/cyankiwi/Qwen3.6-27B-AWQ-INT4",
+        "type": "model-card",
+        "date": ""
+      },
+      {
+        "title": "hampsonw/Qwen3.6-27B-AWQ-BF16-INT4-mtp-bf16（MTP 张量 BF16 graft 说明）",
+        "url": "https://huggingface.co/hampsonw/Qwen3.6-27B-AWQ-BF16-INT4-mtp-bf16",
+        "type": "model-card",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  }
+]

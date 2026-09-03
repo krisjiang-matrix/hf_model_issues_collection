@@ -1,0 +1,37 @@
+name: Daily Candidate Fetch
+
+on:
+  schedule:
+    # 每天 UTC 01:00 = 北京时间 09:00
+    - cron: '0 1 * * *'
+  workflow_dispatch:  # 允许手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install -r automation/requirements.txt
+
+      - name: Fetch candidates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}  # 可选，在 repo Settings > Secrets 配置
+        run: python automation/fetch_candidates.py
+
+      - name: Commit candidates
+        run: |
+          git config user.name "pitfalls-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add automation/candidates/ automation/seen_urls.json
+          git diff --cached --quiet || git commit -m "chore: daily candidates $(date +%F)"
+          git push

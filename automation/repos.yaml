@@ -1,0 +1,73 @@
+# HF 模型问题速查 - 监控仓库清单
+# 每日爬取脚本 fetch_candidates.py 读取此文件
+
+# ============ T0 官方模型厂商（HF author = GitHub org）============
+# 监控：HF Discussions（新模型+新讨论）+ 官方 GitHub issues
+official_orgs:
+  - hf_author: Qwen
+    github_org: QwenLM
+    keywords: [Qwen3, Qwen3.5, Qwen3.6, Qwen3-Coder, Qwen3-Next]
+  - hf_author: deepseek-ai
+    github_org: deepseek-ai
+    keywords: [DeepSeek-V3, DeepSeek-V4, DeepSeek-R1, DeepSeek-R2]
+  - hf_author: zai-org
+    github_org: zai-org
+    keywords: [GLM-4, GLM-5, GLM-5.1]
+  - hf_author: moonshotai
+    github_org: MoonshotAI
+    keywords: [Kimi, Kimi-K2, Kimi-Linear, Moonlight]
+  - hf_author: MiniMaxAI
+    github_org: MiniMax-AI
+    keywords: [MiniMax-M1, MiniMax-M2, MiniMax-M2.7]
+  - hf_author: meta-llama
+    github_org: meta-llama
+    keywords: [Llama-4, Llama-3.3, Maverick, Scout]
+  - hf_author: google
+    github_org: google
+    keywords: [Gemma-4, Gemma-3, gemma-4]
+  - hf_author: mistralai
+    github_org: mistralai
+    keywords: [Mistral-Large, Magistral, Devstral, Mistral-Small]
+  - hf_author: openai
+    github_org: openai
+    keywords: [gpt-oss, gpt-oss-20b, gpt-oss-120b]
+
+# ============ T0 量化发布方（仅 HF，无对应 GitHub 主仓库）============
+# 监控：HF Discussions。量化引入的 bug 只出现在这些仓库的讨论区
+quant_orgs:
+  - hf_author: unsloth
+  - hf_author: bartowski
+  - hf_author: RedHatAI
+  - hf_author: AesSedai
+  - hf_author: cyankiwi
+  - hf_author: inferRouter
+
+# ============ 推理引擎（GitHub Search API 按模型关键词搜 issue）============
+engine_repos:
+  - vllm-project/vllm
+  - sgl-project/sglang
+  - ggml-org/llama.cpp
+  - huggingface/transformers
+  - ollama/ollama
+  - ml-explore/mlx-lm
+
+# ============ Agent 框架（"用某模型跑 agent 就循环"常先在这里爆出）============
+# 注意：仓库名需精确匹配 GitHub 实际路径，否则 Search API 返回 422
+agent_framework_repos:
+  - opencode-ai/opencode
+  - cline/cline
+  - RooCodeInc/Roo-Code
+  - continuedev/continue
+  - openhands/openhands
+
+# ============ 通用搜索关键词（跨仓库，捕获新模型/泛化问题）============
+# GitHub Search: repo:<engine> <keyword> created:>YYYY-MM-DD
+global_keywords:
+  - GGUF broken
+  - NaN perplexity
+  - tool call loop
+  - gibberish output
+  - infinite repeat
+
+# 爬取窗口：首次运行回溯天数（日常运行只抓 last 1 天）
+backfill_days: 3

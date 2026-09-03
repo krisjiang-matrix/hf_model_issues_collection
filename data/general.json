@@ -1,0 +1,802 @@
+[
+  {
+    "id": "gen-001",
+    "model": "通用 / 不限模型",
+    "variant": "所有使用 IQ 系列反量化 kernel 的 GGUF（IQ2_M / IQ3_S / IQ3_XXS / IQ4_XS / IQ4_NL 等），与模型架构相关，不同架构受影响的档位不同",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "b8645–b8746 区间（llama.cpp commit 650bf14 / 009a113 等）",
+    "category": "静默降质",
+    "symptom": "用 CUDA 13.2（nvcc V13.2.51）编译的 llama.cpp 跑低 bit IQ 量化，不报错、不崩溃，但输出完全乱码。典型输出：\"deHH laesLH laHse지원KLHLeHsenH坐es الأخرىHal laHLLteLH...\"（Gemma-4-31B-it IQ3_XXS）、\"I\\ns,\\nHello!\"（Qwen3.5-35B-A3B IQ3_S）、\"laistySS own own own laBoge// own own own own de que que la la...\"（IQ2_M）。同一文件用 CUDA 12.8 / 13.0 编译或纯 CPU（CUDA_VISIBLE_DEVICES=\"\"）跑则完全正常。",
+    "rootCause": "CUDA 13.2 的 NVVM IR 优化器 cicc 在 -O2/-O3（默认）级别对 llama.cpp 的 IQ 反量化 kernel 生成错误代码。定位到 -Xcicc -O0 / -O1 正常、-O2 / -O3 乱码；O2 的 PTX 从 110,942 行膨胀到 226,284 行（约 2 倍），激进内联导致误编译。受影响 kernel 的共同结构：设备端查找表（iq2s_grid[1024]、iq3s_grid[512]、iq3xxs_grid[256]、kvalues_iq4nl[16]）、__byte_perm 内联链、__vcmpne4 + __vsub4 的符号取反模式。K-quants（Q3_K 及以上）纯用位移和掩码解码，不受影响。已排除 ptxas（--ptxas-options=-O0）、主机侧 nvcc -O0、--fmad=false、GGML_CUDA_FORCE_CUBLAS、flash attention 开关。",
+    "workaround": "首选降级到 CUDA 12.8 / 13.0 / 13.1（CUDA 13.2 向下兼容，不必卸载，并列安装后在 cmake 里指向旧 toolkit 即可）。精确的最小代价方案是只在编译时降低 cicc 优化级别：cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_FLAGS=\"-Xcicc -O1\"，或在 CMakeLists 里 set(CMAKE_CUDA_FLAGS \"${CMAKE_CUDA_FLAGS} -Xcicc -O1\")。也可以直接用 Unsloth 预编译的 CUDA 13.0 二进制（github.com/unslothai/llama.cpp/releases/tag/b8746）或 llama.cpp commit 009a1133268d040a7c574a7b9c95413b0be369a9。注意：GGML_CUDA_FORCE_CUBLAS=ON 在部分机器上有效（llama.cpp#21371 的 RTX 5080 报告），但在 RTX PRO 6000 上被证实无效且 Qwen IQ3_S 会 SIGABRT 崩溃，不能作为通用方案。",
+    "status": "有缓解方案",
+    "fixedIn": "NVIDIA 已确认（gaugarg-nv 复现并转 CUDA 编译器团队），修复预计在 CUDA 13.3",
+    "severity": "high",
+    "verdict": "环境问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "llama.cpp CUDA 13.2 gibberish for IQ3_S / IQ3_XXS, IQ2_M - `SOLUTION use CUDA < 13.0 or Unsloth Studio`",
+        "url": "https://github.com/unslothai/unsloth/issues/4849",
+        "type": "github-issue",
+        "date": "2026-04-04"
+      },
+      {
+        "title": "Compile bug: CUDA 13.2 breaks some quants (IQ3_S)",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/21255",
+        "type": "github-issue",
+        "date": "2026-04-01"
+      },
+      {
+        "title": "Eval bug: gemma-4-31B-it-UD-IQ3_XXS.gguf (unsloth) produces gibberish on blackwell (RTX 5080 tested) with GGML_CUDA=ON compilation VS normal correct output with BLAS/CPU compilations",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/21371",
+        "type": "github-issue",
+        "date": "2026-04-03"
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-002",
+    "model": "通用 / 不限模型",
+    "variant": "所有量化模型 / 所有 GGUF 上传者（Unsloth、Bartowski、APEX 等无一例外），含 tool calling 路径",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "b8733 之后的多个版本",
+    "category": "静默降质",
+    "symptom": "在 CUDA 13.2 环境跑任意来源的 GGUF 得到乱码，用户和上传者据此判定「这个量化坏了」并去量化仓库开 issue，但同一模型在 Unsloth Studio / Ollama / LM Studio（非 CUDA 13.2）下正常。GLM-5.1 用户报告同一模型长请求（5000–8000 token）出乱码、短请求正常，被误判为量化长上下文缺陷。Unsloth 官方公告：CUDA 13.2 会让 Gemma 4、GLM-5.1 及所有模型的 tool calling 失效。",
+    "rootCause": "根因是 CUDA 13.2（见 gen-001），而非量化文件。但由于现象只在量化模型上出现（BF16/FP16 不受影响），且不同模型的受影响档位不同（Gemma-4-31B 坏 IQ2_M/IQ3_XXS/Q2_K_XL，Qwen3.5-35B-A3B 反而坏 IQ3_S/IQ4_XS/IQ4_NL 而 IQ2_M/IQ2_XXS 正常），排查极易被误导到「量化缺陷」方向。290 次笛卡尔组合测试确认：CPU-only 全部正常、CUDA 13.0 全部正常（104 次零失败）、只有 CUDA 13.2 失败。",
+    "workaround": "第一步永远是环境隔离，不要先怀疑量化文件：用 CUDA_VISIBLE_DEVICES=\"\" 跑一遍纯 CPU 推理作为对照，若 CPU 正常而 GPU 乱码，问题 99% 在 CUDA 工具链版本。nvcc --version 确认版本，若 >= 13.2 则降级或用 -Xcicc -O1 重编。请求级别的现象（长 prompt 坏、短 prompt 好）也是本 bug 的特征，不要据此去调 rope / context 配置。",
+    "status": "有缓解方案",
+    "fixedIn": "llama.cpp 社区报告 b8808 起现象消失；NVIDIA 侧修复预计 CUDA 13.3",
+    "severity": "high",
+    "verdict": "环境问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "Do NOT use CUDA 13.2",
+        "url": "https://huggingface.co/unsloth/GLM-5.1-GGUF/discussions/4",
+        "type": "hf-discussion",
+        "date": "2026-04-09"
+      },
+      {
+        "title": "[Solved in b8808] IQ4_NL Gibberish in llama.cpp",
+        "url": "https://huggingface.co/unsloth/GLM-5.1-GGUF/discussions/3",
+        "type": "hf-discussion",
+        "date": "2026-04"
+      },
+      {
+        "title": "Dynamic Quants producing garbage thinking output (llama.cpp + Cuda 13 issue)",
+        "url": "https://huggingface.co/unsloth/MiniMax-M2.7-GGUF/discussions/1",
+        "type": "hf-discussion",
+        "date": "2026-04-12"
+      },
+      {
+        "title": "llama.cpp CUDA 13.2 gibberish for IQ3_S / IQ3_XXS, IQ2_M",
+        "url": "https://github.com/unslothai/unsloth/issues/4849",
+        "type": "github-issue",
+        "date": "2026-04-04"
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-003",
+    "model": "通用 / 不限模型",
+    "variant": "Blackwell 消费级卡（RTX 5090 / RTX PRO 6000 / RTX PRO 4000，compute capability 12.0，SM120）上的 NVFP4 / FP4 权重与 MoE 模型",
+    "family": "通用",
+    "quant": "NVFP4",
+    "engine": "多引擎",
+    "engineVersion": "vLLM 0.24.0 及相近版本；FlashInfer 0.6.x",
+    "category": "静默降质",
+    "symptom": "在 RTX 5090 上加载 NVFP4 MoE 检查点，模型能加载、能服务请求、能吐 token，但 MoE expert GEMM 产出数值错误的张量，输出语义不连贯。另一种表现是 vLLM 打印 \"Your GPU does not have native support for FP4 computation but FP4 quantization is being used. Weight-only FP4 compression will be used leveraging the Marlin kernel.\" 后静默走 Marlin W4A16 回退路径，吞吐远低于原生 FP4 应有的水平——而这块卡硬件是支持 FP4 的。",
+    "rootCause": "SM100（B100/B200，tcgen05 指令 + TMEM）与 SM120（RTX 50 系，扩展 mma.sync + 无 TMEM）虽同叫 Blackwell 但架构不兼容，需要各自独立的 kernel 实现。生态里大量代码用 is_device_capability_family(100) 判定 Blackwell，对 SM120 返回 false：vLLM 的 trtllm_nvfp4_moe.py / flashinfer_trtllm_moe.py / flashinfer_cutedsl_moe.py 三个文件把 SM120 挡在原生路径外；FlashInfer JIT 的 supported_major_versions=[10] 也不含 12。更糟的是直接跑 CUTLASS grouped block-scaled GEMM 时 SM120 上静默出错误结果（非崩溃）。社区实测：GDC barrier 标志被静默忽略（compute_120 未定义 __CUDA_ARCH_FEAT_SM120_ALL）、Pingpong schedule 与 compute_120a 强制 gencode 均 SEGFAULT、CUTLASS 4.4.1 问题依旧。",
+    "workaround": "先读日志确认是否落到了 Marlin 回退（出现 \"does not have native support for FP4\" 即已回退）。可用路径：设置 MARLIN 后端（VLLM_USE_TRTLLM_... 之外目前实测唯一直接可用的 MoE 后端，46–49 tok/s）；或打社区补丁把 is_device_capability_family(100) 改为 (100 or 120)、FlashInfer supported_major_versions 加上 12、GDC 用 -DCUTLASS_GDC_ENABLED 直接传参。追求稳定就避开 SM120 上的 NVFP4 MoE，改用 FP8 / AWQ 权重或 llama.cpp GGUF Q4_K_M / Q5_K_M。NVIDIA 内部跟踪编号 nvbugs/5100633。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "环境问题",
+    "confidence": "medium",
+    "date": "2026-07",
+    "sources": [
+      {
+        "title": "SM120 (RTX Blackwell) NVFP4 MoE: CUTLASS Grouped Block-Scaled GEMM Produces Invalid Output; FlashInfer Requires Extensive Patching",
+        "url": "https://github.com/flashinfer-ai/flashinfer/issues/2723",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "[Bug]: RTX 5090 / SM120 ModelOpt mixed NVFP4 checkpoint falls back to Marlin W4A16 path and warns no native FP4 support",
+        "url": "https://github.com/vllm-project/vllm/issues/47749",
+        "type": "github-issue",
+        "date": "2026-07-06"
+      }
+    ],
+    "created_at": "2026-07-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-004",
+    "model": "通用 / 不限模型",
+    "variant": "AMD RDNA 3.5 集成显卡 / APU（gfx1150 Radeon 890M、gfx1151 Radeon 8060S Strix Halo）上的 ROCm 后端",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "llama.cpp",
+    "engineVersion": "ROCm 7.2",
+    "category": "性能回退",
+    "symptom": "Ryzen AI 9 HX370 + Radeon 890M（gfx1150，48GB VRAM + 43GB GTT = 88GB 可用）上，ROCm 后端比 Vulkan 慢 60%：pp512 150 tok/s vs Vulkan 370 tok/s，tg128 18 vs 23。模型加载后有约 400ms 的 sched_reserve 延迟，首 token 延迟高，推理过程中持续 GPU↔CPU 拷数据。",
+    "rootCause": "ROCm 用 hipMalloc 只从独立 VRAM（约 48GB）分配，拿不到 GTT（约 43GB），导致放不下的层溢出到 CPU buffer（实测 GPU buffer 39,217 MiB + CPU buffer 41,660 MiB），产生 94 次 graph split。Vulkan 用 vkAllocateMemory + VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT 能同时访问 VRAM 和 GTT（80,562 MiB GPU + 315 MiB CPU），split 仅 1–2 次。开启 GGML_CUDA_ENABLE_UNIFIED_MEMORY=1 时 hipMallocManaged 在该硬件上回落为 hipMalloc 并报 not supported。上游 ggml-cuda.cu 第 233 行的集成显卡检测逻辑被禁用。",
+    "workaround": "优先改用 Vulkan 后端（-DGGML_VULKAN=ON）而非 ROCm。若必须用 ROCm：升级内核（社区反馈 kernel > 6.12 时 hipMalloc 才能用到 VRAM+GTT），并把 BIOS 里的 VRAM 调到最小（256MB）、GTT 调到最大（如 90GB）。检查实际可用量：cat /sys/class/drm/card0/device/mem_info_vram_total 与 mem_info_gtt_total。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "环境问题",
+    "confidence": "medium",
+    "date": "2026-02",
+    "sources": [
+      {
+        "title": "AMD APU iGPU (GFX1150/RDNA 3.5): ROCm allocates only VRAM, not GTT - 60% slower than Vulkan",
+        "url": "https://github.com/lemonade-sdk/llamacpp-rocm/issues/57",
+        "type": "github-issue",
+        "date": "2026-02-09"
+      },
+      {
+        "title": "AMD APU iGPU (GFX1150/RDNA 3.5): ROCm allocates only VRAM, not GTT - 60% slower than Vulkan",
+        "url": "https://github.com/ROCm/legacy-rocm-build/issues/6050",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-02-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-006",
+    "model": "通用 / 不限模型",
+    "variant": "所有需要自定义 chat template 的 GGUF（尤其社区转换、老模型、模板不在 llama.cpp 内置白名单里的模型）",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "llama.cpp",
+    "engineVersion": "",
+    "category": "chat template",
+    "symptom": "传自定义模板文件给 llama.cpp 时直接崩溃：\"terminate called after throwing an instance of 'std::runtime_error' what(): error: the supplied chat template is not supported: /path/to/prompt-template.tmpl note: llama.cpp was started without --jinja, we only support commonly used templates\"。另一类是模板冲突：模型 GGUF 元数据里已内嵌 tokenizer.chat_template，用户又用 --chat-template 指定了一份，导致模型复读提示词、自我回答、或输出质量明显下降。",
+    "rootCause": "llama.cpp 有两套模板层：src/llama-chat.cpp 的内置分发器（只认 LLM_CHAT_TEMPLATE_* 枚举里硬编码的 40 多种格式，不是 Jinja 解析器）和 common/chat.cpp + common/jinja/ 的完整 Jinja 引擎（读 GGUF 元数据里的 tokenizer.chat_template）。--chat-template 只接受内置模板名（gemma / llama3 / chatml / phi4 等），传文件路径无效；传文件路径必须用 --chat-template-file，且必须同时加 --jinja 才会走 Jinja 引擎。另外 --chat-template 接受的是模板字符串而不是文件名。",
+    "workaround": "用文件 → --jinja --chat-template-file ./template.jinja；用内置名 → --chat-template chatml（不要加 --jinja）。从 HF 拉官方模板：python scripts/get_chat_template.py <hf-repo>（gated 模型需先 huggingface-cli login）。排查模板冲突先用 --no-chat-template 关掉模板隔离问题；服务器用 --chat-template-kwargs '{\"enable_thinking\": false}' 控制思考模式，注意 JSON 冒号后不能有空格（Qwen3.6 会静默拒绝 '{\"enable_thinking\": false}' 这种带空格的写法）。自检一行命令：print(repr(tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)))，确认只有一个 BOS、结尾是开启的 assistant turn。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "",
+    "sources": [
+      {
+        "title": "How to write chat template for llama.cpp?（--jinja 与 --chat-template-file 的区别）",
+        "url": "https://stackoverflow.com/questions/79604935/how-to-write-chat-template-for-llama-cpp",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Chat templates – llama.cpp wiki（内置分发器 vs Jinja 引擎双路径架构）",
+        "url": "https://factory.ai/open-source-wikis/llama-cpp?page=systems%2Fchat-templates.md",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Special Tokens, Chat Templates and Silent Formatting Bugs",
+        "url": "https://multigrid.ai/learn/chat-templates",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-007",
+    "model": "通用 / 不限模型",
+    "variant": "所有用 hermes / Hermes2Pro 风格 tool parser 的模型（LGAI-EXAONE K-EXAONE-236B-A23B 等），开启 MTP 投机解码时必现",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "",
+    "category": "tool call 损坏",
+    "symptom": "流式返回的工具调用参数 JSON 缺最后一个 }，客户端拿到无法解析的截断 JSON。MTP（Multi-Token Prediction）开启时稳定复现，因为 MTP 会把 JSON 结尾的若干 token 与闭合标签打包进同一个预测块。",
+    "rootCause": "vllm/tool_parsers/hermes_tool_parser.py 的关闭分支判断逻辑：elif (cur_tool_start_count == cur_tool_end_count and cur_tool_end_count >= prev_tool_end_count): ... if '\"}' not in delta_text: return None。当模型吐出形如 }</tool_call> 的 chunk 时，vLLM 先截断掉 tag，delta_text 只剩 \"}\"；而前面的双引号 \" 已经在更早的 chunk 里发出去了，于是 '\"}' not in delta_text 为真，函数提前 return None，这个 } 被吞掉且永不投递。该逻辑还错误假设所有参数以字符串结尾——以数字或布尔结尾的调用（如 {\"val\": 123}、{\"active\": true}）同样被截断。单元测试通过是因为测试直接把 </tool_call> 当字面文本注入，与实际 serving 的解码行为不一致。",
+    "workaround": "关闭 MTP / 关闭流式（非流式路径不受影响）是最快的规避。修复方向是移除关闭分支的提前 return，让解析落到 partial_json_parser 逻辑——partial parser 通过对比「已流式发出的参数」与「新解析出的完整参数」计算 delta，对跨 chunk 切分天然健壮。已有 PR #36360「fix(tool_parser): fix hermes parser dropping final brace during MTP streaming」和 INFERENG-5535（修复 stream interval > 1 场景）在推进。客户端侧防御：收到 tool_calls 后先做 JSON 完整性校验，缺右括号时按残缺处理并重试，不要直接执行。",
+    "status": "有缓解方案",
+    "fixedIn": "PR #36360 待合并",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-01",
+    "sources": [
+      {
+        "title": "[Bug]: hermes_tool_parser drops final JSON brace during streaming when tokens are chunked (e.g., MTP enabled)",
+        "url": "https://github.com/vllm-project/vllm/issues/32152",
+        "type": "github-issue",
+        "date": "2026-01-12"
+      }
+    ],
+    "created_at": "2026-01-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-008",
+    "model": "通用 / 不限模型",
+    "variant": "Responses API + 会激进并行生成工具调用的模型（Qwen3.5 系列等）；qwen3_xml parser 用户",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "",
+    "category": "tool call 损坏",
+    "symptom": "Responses API 流式调用直接崩：\"AssertionError: Multiple tool calls in one delta is not supported\"。即便在请求里显式设置 parallel_tool_calls: false，vLLM 仍把多个 tool call 塞进同一个 SSE delta 并触发同一断言。换 --tool-call-parser qwen3_coder 后问题彻底消失。",
+    "rootCause": "qwen3_xml 有一个 _merge_new_deltas_to_single_response 合并步骤，会把多个 tool call 打包进单个 DeltaMessage（任何 chunk 都可能发生，不只是首个）；qwen3_coder 逐个处理，永不触发。Responses API 的 _process_simple_streaming_events 有三处硬编码「一个 delta 只有一个 tool call」的假设：第 1375 行 assert len == 1（首个 delta，硬崩）、第 1574 行 tool_calls[0]（中段流，静默丢弃第一个之后的全部调用）、第 1693 行 assert len == 1（收尾，硬崩）。第四个问题是 parallel_tool_calls=False 完全被忽略——chat completions 路径会调 maybe_filter_parallel_tool_calls() 过滤，Responses 路径从不调用。PR #39586 把 assert 和 [0] 换成了 for 循环，但仍用三个标量变量（current_tool_call_id / name / item_id）跟踪状态，处理 tool call B 时会覆盖 A 的状态，后续 A 的参数片段被归到 B 名下，最终合并成一个 blob 发单个 done 事件——是状态管理问题而非循环问题。投机解码会加剧：draft 模型可能在单次 forward 里生成多个 tool call。",
+    "workaround": "换用 --tool-call-parser qwen3_coder（对 qwen3_xml 用户是直接的规避路径）。若必须用 Responses API 且要并行 tool call，需等服务端把多调用 delta 拆成独立 SSE 事件的完整修复落地，PR #39586 只能止血不能根治。客户端侧加防护：对 tool_calls 数组长度和每个调用的 id 唯一性做断言，出现异常合并时降级为串行调用。",
+    "status": "有缓解方案",
+    "fixedIn": "PR #39586（不完整修复）",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "[Bug]: AssertionError: Multiple tool calls in one delta is not supported - Responses API streaming crashes when model generates parallel tool calls",
+        "url": "https://github.com/vllm-project/vllm/issues/39584",
+        "type": "github-issue",
+        "date": "2026-04-12"
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-009",
+    "model": "通用 / 不限模型",
+    "variant": "所有带 channel 特殊 token 的思考模型（Gemma 4 系列 google/gemma-4-26B-A4B-it、gemma-4-31B-it 等），以及输出格式与所选 reasoning parser 不匹配的模型",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "0.18.2rc1 / 0.19.0",
+    "category": "tool call 损坏",
+    "symptom": "API 返回里 reasoning_content 恒为 null，全部思考过程混进 content：{\"reasoning_content\": null, \"content\": \"thought\\nThe user is asking...\\n2 + 2 = 4\"}。期望是 reasoning_content 拿到思考、content 只拿答案。V1 和 V0（VLLM_USE_V1=0）引擎表现一致。另一类同源问题：DeepSeek 家族 parser（如 poolside_v1）的 reasoning 内容在 SSE chunk 里挂在 reasoning 字段而非 reasoning_content 字段，按 OpenAI/DeepSeek 约定读 reasoning_content 的客户端会看到空。",
+    "rootCause": "模型确实生成了 <start_of_turn>thought\\n... 这类 channel token（通过 logprobs 可确认），但 vLLM 解码时 skip_special_tokens=True 把这些特殊 token 剥掉了，reasoning parser 拿到的文本里看不到 channel 标记。Gemma4ReasoningParser（PR #38826 引入）把 start_token / end_token 定义为文本属性（<start_of_turn> / <end_of_turn>），却没像 Qwen3ReasoningParser 那样实现 start_token_id / end_token_id 供流式路径做 token 级匹配，基类的 extract_reasoning_streaming 收到的文本里标记已被剥除。单元测试通过是因为测试把 <start_of_turn> 当字面文本注入测试串，与实际 serving 行为不符。附带：Gemma4ToolParser.__init__ 签名不匹配（只收 (self, tokenizer)，基类传 (self, tokenizer, tools)）。",
+    "workaround": "请求侧显式关闭特殊 token 剥离：extra_body={\"chat_template_kwargs\": {\"enable_thinking\": True}, \"skip_special_tokens\": False}。客户端侧兼容：先读 reasoning，读不到再读 reasoning_content（vLLM 该构建的 DeltaMessage.reasoning 没有 reasoning_content 别名，可在 vllm/entrypoints/openai/engine/protocol.py 里加一行序列化别名）。根本修复是给 Gemma4ReasoningParser 补 start_token_id / end_token_id（token id 100 / 101），让流式抽取走 token 级匹配。另外注意选对 parser：Qwen3-VL-32B-Thinking 输出实际是 DeepSeek-R1 格式，用 --reasoning-parser qwen3 永远解析不出，必须换 deepseek_r1。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "Missing 'reasoning' field in response when serving gemma-4-31B-it with vLLM（skip_special_tokens: False 解法）",
+        "url": "https://huggingface.co/google/gemma-4-31B-it/discussions/28",
+        "type": "hf-discussion",
+        "date": "2026-04-05"
+      },
+      {
+        "title": "[Bug]: Gemma4 reasoning parser fails to separate reasoning_content — channel tokens stripped before parsing",
+        "url": "https://forums.developer.nvidia.com/t/gemma-4-models-which-vllm-version-any-prs-spotted/365490/97",
+        "type": "github-issue",
+        "date": "2026-04-03"
+      },
+      {
+        "title": "vLLM 部署 Qwen3-VL-32B-Thinking reasoning_content 为空问题解决记录（parser 选错格式）",
+        "url": "https://cloud.tencent.com/developer/article/2581649",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-010",
+    "model": "通用 / 不限模型",
+    "variant": "SGLang 上开投机解码（EAGLE / NEXTN）+ 并行工具调用的思考模型（Qwen3-Next-80B-A3B-Thinking、Qwen3.5 系列）；以及会把 XML 工具调用写进 thinking 通道的模型",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "SGLang",
+    "engineVersion": "0.5.8（0.5.3rc0 是最后一个功能正常的版本）",
+    "category": "tool call 损坏",
+    "symptom": "并行（多个）工具调用在投机解码下损坏：tool_choice=\"auto\" 时 tool call 完全不被解析、以原文塞进 content；tool_choice=\"required\" 时只返回第一个工具调用。单个工具调用两种模式都正常。关掉投机解码后多工具调用仍然有问题——只有 tool_choice=\"auto\" + stream=False 的组合输出正确，其他任何配置都只吐第一个调用。另一类：Qwen3.5-9B / 35B-A3B 在启用 reasoning parser 时，最后一步返回 finish_reason=\"stop\"、tool_calls=[]，而 XML 格式的工具调用文本出现在 reasoning_content 里（12 次重跑 10 成功 2 失败）。",
+    "rootCause": "两类独立问题叠加。(1) 投机解码与多 tool call 解析的交互缺陷，SGLang 0.5.8 回归，0.5.3rc0 之前正常，属于流式和批量路径下 tool call 后处理与 draft token 对齐的问题。(2) 模型侧：Qwen3.5 原生以 XML 风格输出 tool call，由 qwen3_coder parser 转成结构化 JSON；但模型偶尔把 XML 工具调用生成在 thinking / reasoning 通道里，导致 API 层 tool_calls 为空、parser 无内容可转。Qwen 团队确认这与上下文/提示相关而非严格的模型规模相关，在 Qwen3.6-35B-A3B 和 Qwen3.6-27B 上已修复。",
+    "workaround": "(1) 投机解码 + 并行 tool call 场景：降级 SGLang 到 0.5.3rc0，或只使用 tool_choice=\"auto\" + stream=False 这一唯一正确组合，或关闭投机解码并接受只返回首个调用的限制（客户端改为串行发调用）。(2) XML 落进 reasoning_content：关掉框架的 reasoning parser，改在应用层自行管理思考状态（Qwen 团队给出的官方建议），或升级到 Qwen3.6 系列。切勿用提示词强制模型输出 JSON，这会与内嵌 chat template 冲突导致未定义行为，且 qwen3_coder parser 无法处理裸 JSON 输出。",
+    "status": "有缓解方案",
+    "fixedIn": "Qwen3.6-35B-A3B / Qwen3.6-27B 已修复 XML 泄漏问题",
+    "severity": "high",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "2026-02",
+    "sources": [
+      {
+        "title": "[Bug] Broken multiple tool calls in Qwen3-Next-80B-A3B-Thinking with Speculative Decoding",
+        "url": "https://github.com/sgl-project/sglang/issues/18102",
+        "type": "github-issue",
+        "date": "2026-02-02"
+      },
+      {
+        "title": "Qwen3.5-9B / 35B-A3B produce XML-style tool calls instead of JSON under SGLang tool-call parser",
+        "url": "https://github.com/QwenLM/Qwen3.8/issues/125",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-02-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-011",
+    "model": "通用 / 不限模型",
+    "variant": "所有开启 prefix caching 的部署（尤其 ROCm / MI355X gfx950 + bf16、以及需要可复现输出的评测与 A/B 场景）",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "多引擎",
+    "engineVersion": "vLLM >= 0.6 / SGLang",
+    "category": "静默降质",
+    "symptom": "同一条 prompt 在 temperature=0 下，第一次请求（cache miss）与后续请求（cache hit）产生不同的 logits，进而选出不同的 token。在 MI355X（gfx950）+ bf16 上实测 logprob 差异：短 prompt 0.0438、中 prompt 0.0454、长 prompt 1.9097（长上下文差异被放大两个数量级）。社区 fuzz 测试还发现更严重的形态：并发共享前缀时，某请求的开头会凭空多出一个属于其他请求缓存块的 token（Run 2/4 输出 \"1 pre127 pre128...\"，Run 1/3 输出正确的 \" pre127 pre128...\"），10/10 复现。",
+    "rootCause": "两个不同层次的问题。(1) 浮点层面：cache miss 时全部 N 个 token 一次算完（GEMM M=N），cache hit 时只算未缓存的后缀（M = N % block_size）。cuBLAS / Tensile 按 M 维度选 tile 配置，不同 tile 对 K 维归约的分块方式不同，而 fp32 加法不满足结合律，累加顺序变化导致结果差 1 ULP。实测级联放大：layer 0 仅 1/92,160 个元素不同、最大差 0.008（1 ULP），到 layer 14 约 13,500 个元素不同、差 0.5，到 layer 27 约 14,100 个、差 8.0，最终 logits 有 129,895/151,936 个元素不同、argmax 翻转。这不是 race condition——固定矩阵维度反复跑结果不变，是库在形状变化时重映射导致的。(2) 分配器层面：并发下的 KV block 边界映射错误，返回的 block 提前了一个 token。",
+    "workaround": "需要可复现时统一 cache 状态：评测前先 warmup 一次让前缀进 cache，或整批评测前清空 cache。vLLM 有 PR #34046 的 --deterministic-prefix-caching（强制 cache-miss prefill 在最后一个 block 边界切分，使后缀 GEMM 的 M 维度与 cache 状态无关），但自 2026 年 2 月起仍 open。ROCm gfx950 + bf16 的场景已有针对性修复：在 VllmConfig.__post_init__ 里检测到 ROCm + gfx950 + bfloat16 时自动禁用 prefix caching（代价是失去 prefix caching 的性能收益，但不影响 MI325X/gfx942 或 fp16）。SGLang 的 #10278「Support deterministic inference with Batch Invariant Ops」28 项中 17 项完成，剩余未覆盖项包括全部 4 项量化、Blackwell TP4、FlashInfer radix cache、投机解码 drafter，该 issue 已关闭标记 inactive。并发串扰则必须 --no-enable-prefix-caching。",
+    "status": "有缓解方案",
+    "fixedIn": "vLLM PR #34046（open，未合并）",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "medium",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "[Bug]: Potential use-after-free in KV block allocator under eviction pressure（并发下 spurious token）",
+        "url": "https://github.com/vllm-project/vllm/issues/37076",
+        "type": "github-issue",
+        "date": ""
+      },
+      {
+        "title": "A Bug Is a Violation of a Specification（vLLM #34046 与 SGLang #10278 的确定性推理进展与 1 ULP 级联数据）",
+        "url": "https://wpnews.pro/news/a-bug-is-a-violation-of-a-specification",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "The Illusion of Determinism in Disaggregated Inference",
+        "url": "https://wpnews.pro/news/the-illusion-of-determinism-in-disaggregated-inference",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-012",
+    "model": "通用 / 不限模型",
+    "variant": "所有多模态（VLM）部署，尤其「相同文本提示 + 不同图片」的高并发场景（Qwen2.5-VL / Qwen3-VL 系列实测）",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "v1（V1 起 enable_chunked_prefill 默认开启且无法用 --no-enable-chunked-prefill 关闭）",
+    "category": "多模态异常",
+    "symptom": "开启 --enable-prefix-caching 后，高并发或重异步下输出错误：重复、截断或乱码 token。所有请求用相同文本提示但图片不同（结构不同的迷宫图），prefix cache 命中率约 40%。关掉 --no-enable-prefix-caching 后完全正常。多人独立复现：qwen2.5-vl-7b 同类现象；有人在 RTX 3090 上高并发跑纯文本 Qwen3 也出现完全不同的混乱输出（换 RTX 5060 Ti 同环境同 Docker 镜像则不复现），加 --no-enable-prefix-caching 解决。",
+    "rootCause": "prefix cache 的 key 只考虑文本 prompt，没有把图片内容或图片派生 embedding 纳入；不同图片但文本相同的请求命中了同一份缓存前缀。v1 里 chunked mm input 与 prefix caching 的交互进一步放大问题。",
+    "workaround": "多模态服务默认加 --disable-mm-preprocessor-cache --no-enable-prefix-caching --disable-chunked-mm-input。若因内存崩溃，追加 --enforce-eager。硬编码把 vllm/vllm/engine/arg_utils.py 里的 enable_chunked_prefill 改成 False 也有帮助（v1 默认开启且命令行关不掉）。代价是失去 prefix caching 的 prefill 收益，VLM 场景这个交换通常值得。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2025-06",
+    "sources": [
+      {
+        "title": "[Bug]: Prefix caching ignores visual input, causing incorrect multimodal outputs under concurrency",
+        "url": "https://github.com/vllm-project/vllm/issues/20261",
+        "type": "github-issue",
+        "date": "2025-06-30"
+      }
+    ],
+    "created_at": "2025-06-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-013",
+    "model": "通用 / 不限模型",
+    "variant": "所有同时开启投机解码（MTP / EAGLE / ngram）+ KV cache 量化（fp8 / int8）的部署",
+    "family": "通用",
+    "quant": "FP8",
+    "engine": "多引擎",
+    "engineVersion": "vLLM 0.18+ / 0.28",
+    "category": "性能回退",
+    "symptom": "单独开投机解码有加速，单独开 KV cache 量化省显存，两者叠加后投机解码退化成净亏损：平均接受 token 数 μ 从 4.5 掉到 3.5 就能抹掉 20–30% 的加速收益，低于 1.0 时比不开还慢。vLLM 0.18.0 release notes 点名了一个具体案例：Qwen3.5 在 B200 上配 FP8 KV cache 出现精度退化（#37618）。另有报告：Qwen3.8-27B-FP8 在 --kv-cache-dtype fp8 + MTP（num_speculative_tokens=2）+ FLASHINFER + chunked prefill + prefix caching 全开的配置下，连续运行数小时后输出垃圾文本，需重启服务才恢复；调 repetition_penalty 1.1 只暂时缓解，升级到 vLLM 0.28 后复发。",
+    "rootCause": "投机解码的接受概率 r = min(1, M_p(x) / M_q(x)) 隐含假设 target 模型在提议位置的 logit 与 draft 模型在同一数值精度下计算。开启 KV cache 量化后，M_p 使用的 K/V 被舍入到 FP8 或 INT8，target 的 logit 分布发生偏移，与 draft（通常 BF16 KV cache）的分布不再一致，接受率下降。实测 μ 的下降幅度：FP8 E4M3 约 0.3–0.8，INT8 per-token 约 0.5–1.5。而加速曲线在 μ=4 附近有拐点，小幅下降即造成大幅收益损失。",
+    "workaround": "开 KV cache 量化后必须重测并重新调 num_speculative_tokens，不能沿用 BF16 下的配置。经验规则：如果 BF16 下实测 μ 已低于 3.0，就不要再加 FP8/INT8 KV cache——额外的 0.3–1.0 接受率损失会把 μ 推到 1.0 以下，算法变成净亏损。先测后开。全功能叠加（MTP + fp8 KV + chunked prefill + prefix caching）的长时运行不稳定时，用二分法逐个关掉定位，并考虑 --enforce-eager 排除 cudagraph 因素。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "组合问题",
+    "confidence": "medium",
+    "date": "2026",
+    "sources": [
+      {
+        "title": "KV cache quantization: what FP8/INT8 K and V actually buy you, and where they break（μ 下降 0.3–1.5 与 vLLM #37618）",
+        "url": "https://dev.to/tech_nuggets/kv-cache-quantization-what-fp8int8-k-and-v-actually-buy-you-and-where-they-break-4fnl",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Qwen3.8-27B-FP8 Deployment Faces Stability Issues Using vLLM Engine",
+        "url": "https://thenextgentechinsider.com/pulse/qwen38-27b-fp8-deployment-faces-stability-issues-using-vllm-engine",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-014",
+    "model": "通用 / 不限模型",
+    "variant": "所有 HF 仓库里带 generation_config.json 的模型；跨引擎/跨版本输出对不上或质量意外下降的部署",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "vLLM",
+    "engineVersion": "0.8.0 起",
+    "category": "采样参数",
+    "symptom": "同一个模型在不同 vLLM 版本下输出对不上，或生成质量明显低于预期——比如模型作者把 temperature 设成 0.1 这类极低值，导致输出近乎贪婪、缺乏多样性；或设了不合适的惩罚系数。用户以为自己没设采样参数就是「引擎默认」，实际拿到的是模型作者写在 generation_config.json 里的值。",
+    "rootCause": "vLLM 自 0.8.0 起改变了默认行为：如果 HF 模型仓库存在 generation_config.json，vLLM 会应用其中的采样参数并提供给未显式指定 SamplingParams 的请求，覆盖 vLLM 自己的默认值。未在该文件里定义的参数回落到 _DEFAULT_SAMPLING_PARAMS（temperature=1.0，repetition_penalty / top_p / top_k / min_p 均为对采样器无影响的中性值）。另外并非所有模型都提供该文件，即便提供也未必与 model card 上文档推荐的参数一致。",
+    "workaround": "部署前先看模型自带了什么：cat model/generation_config.json。要走 vLLM 内置默认值就显式加 --generation-config vllm（离线 API 是 LLM(generation_config=\"vllm\")）。最稳妥的做法是在客户端每次请求显式传全套采样参数，不要依赖任何一侧的默认值——尤其通过托管 API 访问时你根本看不到服务端的配置。排查跨版本输出差异时，把 generation_config 是否生效作为第一检查项。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "",
+    "sources": [
+      {
+        "title": "Vendor-recommended LLM parameter quick reference（vLLM 默认采样参数行为与 _DEFAULT_SAMPLING_PARAMS）",
+        "url": "https://muxup.com/2025q2/recommended-llm-parameter-quick-reference",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "vLLM 快速入门 — generation_config.json 默认采样参数说明",
+        "url": "https://docs.vllm.com.cn/en/latest/getting_started/quickstart.html",
+        "type": "official",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-015",
+    "model": "通用 / 不限模型",
+    "variant": "所有需要把上下文扩到超过模型原生 max_position_embeddings 的部署（Qwen3-Next-80B、Qwen3.6-35B-A3B 等 262K 原生窗口模型）",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "多引擎",
+    "engineVersion": "vLLM 0.19.1+ / SGLang 0.5.9+ / Transformers 5.8.1+（低于此版本不识别 YaRN 参数）",
+    "category": "长上下文退化",
+    "symptom": "三个高频报错/陷阱：(1) \"Input prompt (xxxxx tokens) + lookahead slots (0) is too long and exceeds the capacity of the block manager.\"(2) 只调 --max-model-len 131072 而不配 rope scaling——服务接受 131,072 token 但在 32,768 之后输出持续劣化，这是最常见的错误姿势。(3) 只配 rope scaling 不调 --max-model-len——缩放生效但服务仍然拒绝长请求。此外旧版 --rope-scaling 参数已废弃，改用 --hf-overrides 传 rope_parameters，拼写错误的配置会被静默忽略而非报错。",
+    "rootCause": "--rope-scaling / --hf-overrides 改变的是位置编码方式，--max-model-len 改变的是服务端愿意接受的长度上限，两者必须配套设置。超过模型原生窗口时 vLLM 会拒绝启动，需要环境变量显式授权「我知道超出训练范围了」。另外 vLLM 和 Transformers 都实现的是静态 YaRN：缩放对所有请求无条件生效，与输入长度无关，因此短输入被拉伸到 130 倍位置频率后性能反而下降。",
+    "workaround": "vLLM：VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 vllm serve MODEL --hf-overrides '{\"text_config\": {\"rope_parameters\": {\"rope_type\": \"yarn\", \"factor\": 2.0, \"original_max_position_embeddings\": 262144}}}' --max-model-len 524288。SGLang 对应 SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1 + --json-model-override-args '{\"rope_scaling\": {...}}' + --context-length。factor 按实际需要的最大长度取：典型 524,288 token 用 factor 2.0，不要无脑 4.0。切勿全局启用 YaRN——按输入 token 数路由，<= 262K 走默认实例、超出走 YaRN 实例（两个实例 + 路由器的部署形态）。block manager 报错的另外两个解法是加大 --max-model-len 或减小 --max-num-batched-tokens。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "",
+    "sources": [
+      {
+        "title": "Context Extension — vLLM 官方 YaRN / rope_parameters 配置（注：--rope-scaling 已废弃）",
+        "url": "https://vllm.readthedocs.io/en/latest/features/context_extension",
+        "type": "official",
+        "date": ""
+      },
+      {
+        "title": "Qwen2.5's Context Window and the YaRN Extension（只设一个参数的两种失败形态）",
+        "url": "https://dev.to/multigrid/qwen25s-context-window-and-the-yarn-extension-3ap9",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-016",
+    "model": "通用 / 不限模型",
+    "variant": "HF 上所有社区上传的 GGUF（含 Unsloth、Bartowski、APEX 等所有上传者）",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "",
+    "category": "量化质量",
+    "symptom": "MiniMax-M2.7 的量化文件在 PPL 评测中直接报 NaN。Unsloth 的统计：Bartowski 的 26 个量化里有 10 个（38%）、Unsloth 自己的 23 个里有 5 个（22%）存在 NaN。社区独立复现：unsloth/MiniMax-M2.7-GGUF 的 UD-Q4_K_XL 用 llama-perplexity 跑 wiki.test.raw 得到 NaN/爆炸值，而 aessedai/MiniMax-M2.7-Q5_K_M 与 ubergarm/MiniMax-M2.7-IQ5_K 同样测法完全正常。这类文件加载推理时不报错，用户往往用了很久才发现输出有问题。",
+    "rootCause": "量化流水线本身的缺陷（含 block 内尺度/零块问题），不是后端 kernel 也不是 CUDA 13.2。社区指出可用 llama-quantize 的 --validate-quants 在发布前检出「0 块」类问题，说明是可以在上传前拦截的质量事故而非不可抗力。",
+    "workaround": "下载任何 GGUF 后先做 PPL 自检再投入生产：llama-perplexity -m MODEL.gguf -f wikitext-2-raw/wiki.test.raw -fa 1 -ctk f16 -c 512 -ngl 99 -b 512 -ub 512 --seed 1337 --chunks 250，出现 NaN 即弃用该文件。更严格的量化质量评估用 KLD 两步法（比 PPL 更能反映与原始 BF16 分布的偏离，Unsloth 主张用 99.9% KLD 而非平均 KLD）：第一步用 BF16 原版生成基线 llama-perplexity -m BF16.gguf --kl-divergence-base base.dat -f corpus.txt -fa -ngl 99 --seed 1337 --threads 1；第二步对量化版跑 llama-perplexity -m QUANT.gguf --kl-divergence-base base.dat --kl-divergence -f corpus.txt -fa -ngl 99 --seed 1337 --threads 1，读 Median KLD / 99.0% KLD / RMS Δp。注意 KLD 和 PPL 都可能被校准语料污染误导（大部分 GGUF 在 512 上下文 wiki-test 上评，若 imatrix 校准集含维基类样本会天然偏低），需结合真实任务评测。Unsloth 对 MiniMax-M2.7 的临时解法是 Q6_K 技巧。上传者侧：发布前跑 llama-quantize --validate-quants。",
+    "status": "有缓解方案",
+    "fixedIn": "Unsloth 已修补自己的版本",
+    "severity": "high",
+    "verdict": "量化问题",
+    "confidence": "medium",
+    "date": "2026-08",
+    "sources": [
+      {
+        "title": "Qwen3.6 GGUF Benchmarks（r/LocalLLaMA，含 MiniMax 2.7 NaN 比例：Bartowski 10/26=38%、Unsloth 5/23=22%）",
+        "url": "https://reddit.com/r/LocalLLaMA/comments/1so5nrl/qwen36_gguf_benchmarks/",
+        "type": "reddit",
+        "date": ""
+      },
+      {
+        "title": "unsloth – MiniMax-M2.7-GGUF in BROKEN (UD-Q4_K_XL) -> avoid usage（llama-perplexity NaN 复现与 --validate-quants）",
+        "url": "https://provide.ai/?p=50923",
+        "type": "blog",
+        "date": ""
+      },
+      {
+        "title": "Quant Cookers Basic Guide（llama-perplexity PPL 与 llama-perplexity --kl-divergence 两步 KLD 命令）",
+        "url": "https://github.com/ikawrakow/ik_llama.cpp/discussions/434",
+        "type": "github-issue",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-08-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-017",
+    "model": "通用 / 不限模型",
+    "variant": "所有 MoE 架构的 GGUF 低 bit 量化（Q2_K / IQ2_* / IQ3_* 档位风险最高），以及混合架构（Mamba + Attention）模型",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "",
+    "category": "量化质量",
+    "symptom": "MoE 模型量化到 2bit 档位时能力断崖式下跌。实测：Qwen3.6-35B-A3B 在 Q2_K 下不带 imatrix 相比带 imatrix，BFCL（函数调用）从约 82% 掉到 54%，差 28 个点。同一档位下不同校准语料之间也有约 10 个点的差距。",
+    "rootCause": "imatrix 通过跑校准文本记录各通道的激活统计量，告诉量化器哪些输入通道更重要、误差该往哪里让步。MoE 的核心难点是专家激活覆盖不全——MoE 每次前向只激活少部分专家，如果校准语料领域单一（比如纯维基百科文本），大量专家从未被激活，量化器对它们的权重只能盲压。Bartowski 的 v5 语料基本是纯文本（含多语言），缺少 instruct 模型实际遇到的控制 token、角色标记和工具定义。实测结论：约 4 bits/weight 以上时校准语料的选择影响很小且不一致；Q2 级别时影响巨大，尤其 MoE。",
+    "workaround": "量化时务必带 imatrix：llama-imatrix -m BF16.gguf -f calibration.txt -o imatrix.dat --chunk 512 -ngl 99，然后 llama-quantize --imatrix imatrix.dat BF16.gguf OUT.gguf Q2_K。校准语料要覆盖目标领域：Bartowski v6 数据集（2026-08-17 发布）把多样散文（多语言+代码）与经各模型 chat template 渲染过的 tool-use 对话按 2:3 混合，专门为了激活更广的专家面，并附带渲染脚本；语料处理量 100K–500K token。下载 GGUF 时优先选上传者公开了 imatrix 数据与渲染后校准文本的（可核查校准是否偷懒）。注意 imatrix 的代价：I 类量化（iq3_xxs、iq2_s 等）推理慢 5–10%。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "量化问题",
+    "confidence": "high",
+    "date": "2026-08",
+    "sources": [
+      {
+        "title": "Bartowski releases an imatrix dataset for the ugly end of model quantization（Q2_K 无 imatrix 掉 28 点 BFCL、语料间 10 点差距）",
+        "url": "https://runtimewire.com/article/bartowski-imatrix-v6-dataset-gguf-quantization",
+        "type": "blog",
+        "date": "2026-08-17"
+      },
+      {
+        "title": "New imatrix dataset（Bartowski v6 校准数据集发布说明）",
+        "url": "https://www.plushcap.com/content/huggingface/blog/huggingface-new-imatrix-dataset",
+        "type": "blog",
+        "date": "2026-08-17"
+      }
+    ],
+    "created_at": "2026-08-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-018",
+    "model": "通用 / 不限模型",
+    "variant": "Unsloth 动态量化的中高档位（UD-Q4_K_XL、UD-Q5_K_XL），以及所有 MXFP4 档位",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "",
+    "category": "量化质量",
+    "symptom": "反直觉现象：按平均 KLD 或 99.9% KLD 排序，中高档位（Q4_K_XL / Q5_K_XL）看起来比低档位（IQ3_XXS）好很多，但按最大 KLD（极端离群值）看，中高档位反而可能更差——少量 token 上存在灾难性的概率塌陷。Unsloth 2026-03-05 的针对性更新实测：UD-Q4_K_XL 最大 KLD 从 5.894 降到 2.877（-51%）但体积增加 7.8%（19.2→20.7 GB），UD-Q5_K_XL 从 5.536 降到 3.210（-42%）体积增加 6%（23.2→24.6 GB）——即原先那批中档文件确实存在严重的离群值问题，需要用更多体积去补。另一例：DeepSeek-V4-Flash 上，其他上传者标为「无损」的 155GB Q4_K_XL 实测 top-1% 一致率只有 96.04%，根本不是无损。",
+    "rootCause": "平均类指标（PPL、平均 KLD、99.9% KLD）会把极端离群 token 的错误平均掉，量化器如果只对着这些指标优化，就会产出「整体很漂亮、个别 token 灾难」的文件。而 agent / 工具调用 / 长链推理恰恰是被那 0.1% 的离群 token 决定成败的。",
+    "workaround": "评估量化文件时不要只看平均 KLD，同时看最大 KLD（尤其用于 agent / 工具调用场景）。下载前查上传者的完整 KLD 表（含 mean / 99% / 99.9% / max 与 top-1% 一致率），避开只报单一数字的仓库。对「标称无损」的 4bit 文件保持怀疑——除非 top-1% 一致率是 100%，否则不是无损（FP8 转 Q8_0 也不是无损的，实测 RMSE 不为 0）。",
+    "status": "有缓解方案",
+    "fixedIn": "Unsloth 2026-03-05 更新已降低中档最大 KLD",
+    "severity": "medium",
+    "verdict": "量化问题",
+    "confidence": "medium",
+    "date": "2026-03",
+    "sources": [
+      {
+        "title": "Qwen3.5 GGUF 基准测试（Unsloth 官方：2026-03-05 中档最大 KLD 优化前后对照表）",
+        "url": "https://unsloth.ai/docs/zh/mo-xing/qwen3.5/gguf-benchmarks",
+        "type": "official",
+        "date": "2026-03-05"
+      },
+      {
+        "title": "KLD Benchmarks + why Q8_K_XL vs MXFP4 naming（完整 KLD 表与 155GB「无损」Q4_K_XL 仅 96.04% top-1%）",
+        "url": "https://huggingface.co/unsloth/DeepSeek-V4-Flash-0731-GGUF/discussions/11",
+        "type": "hf-discussion",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-03-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-019",
+    "model": "通用 / 不限模型",
+    "variant": "混合架构（Mamba / SSM + Attention）与 MoE 模型的所有 GGUF（Qwen3.5 系列、MiniMax 等），影响所有量化上传者",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "llama.cpp",
+    "engineVersion": "",
+    "category": "量化质量",
+    "symptom": "某些张量类型对量化极度敏感，把它们的 bit 数压低会让 KLD 暴涨，但省下的磁盘空间微乎其微。实测（Qwen3.5，121 种配置、9TB 研究工件）：ssm_out 在 q2_k 时表现远差于其他档位，量化它带来的体积收益几乎为零；混合架构下的 attn_* 张量同样敏感。MXFP4 在多类张量上异常偏高：attn_gate、attn_q、ssm_beta、ssm_alpha 用 MXFP4 明显不如 Q4_K，而 MXFP4 每权重 4.25 bit、Q4_K 每权重 4.5 bit，二者之间应选 Q4_K。",
+    "rootCause": "不同张量类型在模型中的数值角色差异极大。适合激进量化的：ffn_up_exps、ffn_gate_exps 通常可压到 3 bit；ffn_down_exps 稍敏感。不适合量化的：ssm_out（Mamba 层输出）、ssm_* 系列、混合架构的 attn_*（注意力在混合架构中承担跨 token 关系追踪的精度职责）。",
+    "workaround": "用 llama-quantize 的 --tensor-type / 自定义 --custom-q 保留敏感张量的精度，例如把 attn_* 和 ssm_out 留在 bf16 或 q8_0、只把 ffn_* 压到 iq3_xxs 附近。经验配方：ffn_*(down/up/gate) 保持约 iq3_xxs 是磁盘空间与 99.9% KLD 的最佳折中，压到 2 bit 会显著劣化；attn_* 与 ssm_* 保持高精度。Unsloth 已在 Qwen3.5 上从 Q2_K_XL / Q3_K_XL / Q4_K_XL 中全面退役 MXFP4（除非是纯 MXFP4_MOE）。下载社区量化时可优先选明确公开了 tensor-type 配方（如 dinerburger 的 attn 保持 bf16 / ffn 压 IQ4_XS 方案）的仓库。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "量化问题",
+    "confidence": "high",
+    "date": "2026-03",
+    "sources": [
+      {
+        "title": "Qwen3.5 GGUF 基准测试 — 张量类型敏感度与 imatrix 效果（Unsloth 官方）",
+        "url": "https://unsloth.ai/docs/zh/mo-xing/qwen3.5/gguf-benchmarks",
+        "type": "official",
+        "date": "2026-03"
+      },
+      {
+        "title": "The Quantization Underground: How a 4-Line Hack Taught AI Models to Forget Selectively（--tensor-type 逐张量精度控制与 attn 保 bf16 实践）",
+        "url": "https://news.future-shock.ai/the-quantization-underground",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-03-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-020",
+    "model": "通用 / 不限模型",
+    "variant": "所有社区量化仓库的使用者（Unsloth / Bartowski / lmstudio-community 等），以及原版模型仓库的维护者",
+    "family": "通用",
+    "quant": "GGUF",
+    "engine": "多引擎",
+    "engineVersion": "",
+    "category": "量化质量",
+    "symptom": "量化引入的 bug 只会发酵在量化仓库的讨论区，原版（官方）模型仓库的 issue 区搜不到任何痕迹，反之亦然——两边信息完全割裂，导致同一问题被反复独立发现、反复排查。典型案例：Unsloth 在 Qwen3.5 GGUF 基准页提到的「工具调用聊天模板问题」，明确注明「影响所有量化上传者和类型，无论你在哪里使用或来自哪里」，但这个信息只存在于量化仓库一侧。另一例：Gemma 4 的 GGUF 重传了 4 次，其中 3 次根因是 llama.cpp 的 bug（Unsloth 参与调查并贡献修复）、1 次是 Google 官方改了聊天模板——前 3 次的根因在 llama.cpp 仓库，第 4 次的根因在 Google 仓库，第 5 方（用户）需要同时盯三个地方才能拼出全貌。",
+    "rootCause": "HF 每个仓库有独立的 Community 标签页讨论区，量化 fork 与原版仓库之间无 issue 联动机制；GitHub 侧同理。量化产物的缺陷既不属于原版模型的 bug tracker，也常常不在 llama.cpp / vLLM 的 tracker 里（因为根因可能是量化参数、校准语料或上传流程）。形成三方（模型原作者 / 量化上传者 / 推理引擎）信息孤岛。",
+    "workaround": "排查量化异常时必须跨仓库搜索，至少覆盖四处：原版模型仓库讨论区、量化仓库讨论区、推理引擎 issue 区（llama.cpp / vLLM / SGLang）、以及 Reddit r/LocalLLaMA。定位到根因后优先在真正属于它的仓库开 issue（量化缺陷→量化仓库；kernel bug→引擎仓库），而不是在最先发现现象的地方。利用公开研究工件的仓库（Unsloth 为 Qwen3.5 公开了 9TB 工件与全部 121 种配置的 KLD 指标）做交叉验证。团队内建议把「GGUF 文件 hash + 上传者 + 修订版本 + 引擎 commit」记入部署工单，便于问题被报告时能定位到自己用的那一份。",
+    "status": "未修复",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "组合问题",
+    "confidence": "high",
+    "date": "",
+    "sources": [
+      {
+        "title": "Qwen3.5 GGUF 基准测试 — 「影响所有量化上传者」的工具调用聊天模板问题与 Gemma 4 四次重传根因说明",
+        "url": "https://unsloth.ai/docs/zh/mo-xing/qwen3.5/gguf-benchmarks",
+        "type": "official",
+        "date": ""
+      },
+      {
+        "title": "Qwen3.6 GGUF Benchmarks（Unsloth 说明 GGUF 频繁更新中约 95% 根因不在自己控制范围）",
+        "url": "https://reddit.com/r/LocalLLaMA/comments/1so5nrl/qwen36_gguf_benchmarks/",
+        "type": "reddit",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-021",
+    "model": "通用 / 不限模型",
+    "variant": "OpenCode 1.2.1 等会在 assistant 返回 finish=stop 后继续轮询的 agent 框架；所有客户端生成 message id 的实现",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "Agent框架",
+    "engineVersion": "OpenCode 1.2.1",
+    "category": "循环重复",
+    "symptom": "模型已明确返回 finish=stop，但 agent 不终止循环，持续创建新 assistant 消息。一次实测：2 条 user 消息产生 94 条 assistant 消息（其中 88 条 finish=stop、6 条 finish=tool-calls），累计 44,000+ input tokens，直到用户手动 abort 抛出 MessageAbortedError。UI 上表现为「一直在思考」，实际什么都没产出。",
+    "rootCause": "packages/opencode/src/session/prompt.ts 第 263–271 行的循环终止条件依赖字符串比较 lastUser.id，而 id 生成策略导致 lastUser.id \"c\" → lastUser.id \"c\" 的比较恒为 false，终止分支永不命中。同源问题在 Web UI 场景由客户端生成 message id 且客户端与服务器时钟不一致时触发（issue #11863）；另有一条「auto-compaction 在 assistant 结束回合后陷入无限循环」的变体。",
+    "workaround": "升级到修复版本（该 issue 被判为 #11863 与 #11153 的重复，#11863 含完整的逻辑分解）。运维侧：对 agent 会话设硬性上限——最大 assistant 消息数、累计 input token 预算、以及 wall-clock 超时，三者任一触发即中断；在 UI 上把「assistant 消息数 / 用户消息数」比值做成可见指标，异常时能第一时间发现。使用 glm-5 等国产模型时尤其要注意（该报告的复现模型）。",
+    "status": "有缓解方案",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-02",
+    "sources": [
+      {
+        "title": "Session Loop Termination Condition Fails Causing Infinite Loop",
+        "url": "https://github.com/anomalyco/opencode/issues/13577",
+        "type": "github-issue",
+        "date": "2026-02-14"
+      }
+    ],
+    "created_at": "2026-02-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-023",
+    "model": "通用 / 不限模型",
+    "variant": "所有 agent 框架（OpenClaw、Cline、Roo Code、Continue、OpenHands 等），小模型/开源模型风险显著更高",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "Agent框架",
+    "engineVersion": "OpenClaw 2026.4.11 / v2026.4.23",
+    "category": "循环重复",
+    "symptom": "agent 反复调用同一个失败的工具，无限重试。一次真实事故：用户问了个需要联网搜索的问题，agent 反复调用一个并未注册的 WebSearch（实际只配了 web_search / tavily_search），每次返回 \"Tool WebSearch not found\"，在 434 条 assistant 消息里重试了 754 次，消耗 3.57M input tokens、约 $70 API 成本，零有效输出。另一类是「上下文溢出 → 压缩 → 同一个循环」的死循环：压缩没能打破循环，agent 继续烧 token。",
+    "rootCause": "缺少对「重复且无进展的工具失败」的熔断。每个失败的尝试都被追加进上下文，而上下文污染让下一次尝试更难成功（失败历史挤占了原始指令的空间），形成 retry inflation 级联：首次失败 15% 上下文 → 重试后 30% → 二次重试 55% → 临界 85% → 会话崩溃重启 → 成本指数增长。这不是模型能力问题，是框架缺少确定性护栏。",
+    "workaround": "OpenClaw 已内置两层护栏（v2026.4.23 起）：(1) tools.loopDetection 滚动历史检测器，含 genericRepeat / knownPollNoProgress / pingPong 三个 detector，可配 historySize(30) / warningThreshold(10) / criticalThreshold(20) / unknownToolThreshold(10) / globalCircuitBreakerThreshold(30)；critical 时在执行前拦截整个 tool batch，同一 run 内第二次 critical 直接终止 run。no-progress 哈希会剥离易变元数据（duration/PID/session id/cwd，以及 message id / file id / timestamp），保证「不同的已送达结果」不会被误判为无进展。(2) post-compaction guard：压缩重试后武装，窗口内出现相同 (toolName, argsHash, resultHash) 三元组即中止并报 compaction_loop_persisted。注意 enabled 默认 false，官方文档明确建议「小模型设 enabled: true」，旗舰模型可保持 unset 但仍享有 post-compaction guard。unknown-tool stream guard 自 v2026.4.23 起默认常开（即使 enabled: false 也生效），会把重复出现的不可用工具重写为纯文本 \"I can't use the tool ... stop retrying it and answer without that tool.\" 强制模型放弃。Cline / Roo Code 侧的对应手段：把最大迭代次数限制在 10–15、关闭写入与终端执行的 auto-approve、配 .clineignore / .rooignore 排除 node_modules 等重目录、并在 provider 层设硬性消费上限（OpenRouter 日限 $5 / Anthropic 月预算 $30–50 / OpenAI 软限 $20 硬限 $40）。",
+    "status": "已修复",
+    "fixedIn": "OpenClaw v2026.4.23（CHANGELOG 记录 + unknown-tool stream guard 默认开启）",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-04",
+    "sources": [
+      {
+        "title": "Circuit breaker for repeated tool failures in agent loop（754 次重试 / 3.57M tokens 事故与已落地护栏清单）",
+        "url": "https://github.com/openclaw/openclaw/issues/67399",
+        "type": "github-issue",
+        "date": "2026-04-15"
+      },
+      {
+        "title": "Tool-loop detection · OpenClaw 官方文档（配置字段、默认阈值、post-compaction guard）",
+        "url": "https://docs.openclaw.ai/tools/loop-detection",
+        "type": "official",
+        "date": ""
+      },
+      {
+        "title": "Preventing Agent Infinite Loops in Cline and Roo Code（最大迭代次数与 provider 层预算配置）",
+        "url": "https://sapirex.com/en/preventing-agent-infinite-loops-in-cline-and-roo-code-a-practical-guide-to-configuring-api-budgets-and-context-resets",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2026-04-01",
+    "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-025",
+    "model": "通用 / 不限模型",
+    "variant": "所有把 apply_chat_template 输出再喂回 tokenizer 的代码路径（自研推理服务、训练数据预处理、TRL DataCollatorForChatML 等）",
+    "family": "通用",
+    "quant": "多种",
+    "engine": "Transformers",
+    "engineVersion": "",
+    "category": "chat template",
+    "symptom": "输入序列开头出现两个 BOS token，模型输出质量可测量地下降——不报错、不崩，只是明显变笨。实测复现（Mixtral-8x22B-Instruct-v0.1）：tokenizer.apply_chat_template(messages, tokenize=False) 后再 tokenizer(prompt) 得到 [INST] Hello![/INST] Hi there![INST] How are you?[/INST]，比 tokenize=True 路径多一个 。同类问题在 TRL 的 DataCollatorForChatML 里造成两个 bug：prompt 和 completion 各自被额外加了 BOS，且 completion 漏掉 EOS，导致预期输出被忽略、只保留 BOS。",
+    "rootCause": "apply_chat_template 已经输出了 BOS，把它的结果再过一遍 tokenizer 时 add_special_tokens 默认为 true，于是又加一个。两个 BOS 是模型训练时从未见过的输入形态。HF 官方文档明确指出：chat template 应已包含所需全部特殊 token，额外添加往往重复且有害。",
+    "workaround": "用 apply_chat_template(messages, tokenize=False) 拿字符串后，再 tokenize 时必须显式 add_special_tokens=False；或者直接用 apply_chat_template(messages, tokenize=True, return_tensors=\"pt\") 一步到位，跳过第二次调用。训练数据预处理同理（TRL DataCollatorForChatML 的修复 PR #2172）。日常自检一行：print(repr(tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True))) 用 repr 而非 print（换行和尾随空格才可见），再 print(tok.convert_ids_to_tokens(ids)[:12]) 确认 BOS 只有一个、结尾是开启的 assistant turn。把这两条写成断言放进 CI，tokenizer 库升级或换 checkpoint 时当天就能发现。同族陷阱：漏 add_generation_prompt=True（模型会续写用户消息而不是回答）、套错模板（Llama 2 的 [INST] 套到 Llama 3 上，输出连贯但明显变笨）、模板无 system 槽位静默折叠、生成提示后多余空格改变首 token。",
+    "status": "有缓解方案",
+    "fixedIn": "TRL PR #2172",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2025-11",
+    "sources": [
+      {
+        "title": "Repeated bos_token_id is added when using tokenizer",
+        "url": "https://github.com/huggingface/transformers/issues/42221",
+        "type": "github-issue",
+        "date": "2025-11-15"
+      },
+      {
+        "title": "Incorrect data processing in DataCollatorForChatML（BOS 重复 + EOS 缺失两个 bug 的成因与修复）",
+        "url": "https://github.com/huggingface/trl/issues/2169",
+        "type": "github-issue",
+        "date": "2024-10-04"
+      },
+      {
+        "title": "Special Tokens, Chat Templates and Silent Formatting Bugs（五类静默格式 bug 与一行诊断法）",
+        "url": "https://multigrid.ai/learn/chat-templates",
+        "type": "blog",
+        "date": ""
+      }
+    ],
+    "created_at": "2025-11-01",
+    "updated_at": "2026-09-03"
+  }
+]
