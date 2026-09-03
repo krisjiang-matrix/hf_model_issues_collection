@@ -75,6 +75,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, "P
 .severity-high { background: rgba(248,81,73,0.15); color: var(--high); }
 .severity-medium { background: rgba(210,153,34,0.15); color: var(--medium); }
 .severity-low { background: rgba(63,185,80,0.15); color: var(--low); }
+.severity-unknown { background: rgba(139,148,158,0.15); color: var(--text2); }
 .badge-verdict { background: rgba(88,166,255,0.1); color: var(--accent); }
 .badge-engine { background: rgba(139,148,158,0.15); color: var(--text2); }
 .badge-status-ok { background: rgba(63,185,80,0.15); color: var(--low); }
@@ -126,6 +127,7 @@ body { background: var(--bg); color: var(--text); font-family: -apple-system, "P
     <button class="filter-btn" data-sev="high">高危</button>
     <button class="filter-btn" data-sev="medium">中危</button>
     <button class="filter-btn" data-sev="low">低危</button>
+    <button class="filter-btn" data-sev="unknown">待定</button>
   </div>
   <div class="filter-group" id="statusFilters">
     <button class="filter-btn active" data-stat="all">全部</button>
@@ -242,7 +244,7 @@ function getFilteredData() {
       (d.id || '').toLowerCase().includes(q)
     );
   }
-  if (state.severity !== 'all') data = data.filter(d => d.severity === state.severity);
+  if (state.severity !== 'all') data = data.filter(d => (d.severity || 'unknown') === state.severity);
   if (state.status !== 'all') data = data.filter(d => d.status === state.status);
   if (state.family !== 'all') data = data.filter(d => d.family === state.family);
   if (state.category !== 'all') data = data.filter(d => d.category === state.category);
@@ -265,6 +267,13 @@ function statusBadge(status) {
   return `<span class="badge ${map[status] || 'badge-status-works'}">${status || 'unknown'}</span>`;
 }
 
+function sevClass(v) {
+  return (v === 'high' || v === 'medium' || v === 'low') ? v : 'unknown';
+}
+function sevLabel(v) {
+  return v === 'high' ? '🔴 高危' : v === 'medium' ? '🟡 中危' : v === 'low' ? '🟢 低危' : '⚪ 待定';
+}
+
 function renderCards() {
   const data = getFilteredData();
   const grid = document.getElementById('cardGrid');
@@ -279,7 +288,7 @@ function renderCards() {
       </div>
       <div class="badge-row" style="margin-bottom:8px">
         ${isNew(d) ? '<span class="badge badge-new">NEW</span>' : ''}
-        <span class="badge severity-${d.severity}">${d.severity === 'high' ? '🔴 高危' : d.severity === 'medium' ? '🟡 中危' : '🟢 低危'}</span>
+        <span class="badge severity-${sevClass(d.severity)}">${sevLabel(d.severity)}</span>
         <span class="badge badge-verdict">${esc(d.verdict)}</span>
         <span class="badge badge-engine">${esc(d.engine)}</span>
         <span class="badge badge-engine">${esc(d.quant)}</span>
@@ -365,7 +374,7 @@ function openDetail(id) {
     <div style="color:var(--text2);font-size:13px;margin-bottom:12px">${esc(d.variant)}</div>
     <div class="badge-row" style="margin-bottom:16px">
       ${isNew(d) ? '<span class="badge badge-new">NEW</span>' : ''}
-      <span class="badge severity-${d.severity}">${d.severity === 'high' ? '🔴 高危' : d.severity === 'medium' ? '🟡 中危' : '🟢 低危'}</span>
+      <span class="badge severity-${sevClass(d.severity)}">${sevLabel(d.severity)}</span>
       <span class="badge badge-verdict">${esc(d.verdict)}</span>
       <span class="badge badge-engine">${esc(d.engine)}</span>
       <span class="badge badge-engine">${esc(d.quant)}</span>

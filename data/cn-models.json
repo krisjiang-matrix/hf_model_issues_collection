@@ -638,5 +638,35 @@
     ],
     "created_at": "2025-06-01",
     "updated_at": "2026-09-03"
+  },
+  {
+    "id": "cn-021",
+    "model": "GLM-5.3-Flash",
+    "variant": "sgl-project/sglang",
+    "family": "GLM",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "性能异常",
+    "symptom": "长上下文prefill阶段FP8 MQA logits计算导致显存溢出，引发TP ranks崩溃。",
+    "rootCause": "长上下文prefill阶段fp8_mqa_logits显存分配异常，引发CUDA OOM导致服务崩溃。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug] GLM-5.3-Flash: CUDA OOM in fp8_mqa_logits during long-context prefill kills all TP ranks",
+        "url": "https://github.com/sgl-project/sglang/issues/37712",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
   }
 ]

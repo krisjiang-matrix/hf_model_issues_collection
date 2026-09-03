@@ -1,0 +1,2147 @@
+[
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen-Drive-1.0-4B",
+      "matched_keyword": "",
+      "title": "Demo for this model on Spaces",
+      "url": "https://huggingface.co/Qwen/Qwen-Drive-1.0-4B/discussions/1",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "",
+      "variant": "Qwen/Qwen-Drive-1.0-4B",
+      "family": "Qwen",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "非技术问题，仅为Demo展示请求",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Demo for this model on Spaces",
+          "url": "https://huggingface.co/Qwen/Qwen-Drive-1.0-4B/discussions/1",
+          "type": "hf-discussion",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "非技术问题，仅为Demo展示请求"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen3.8-2.4T-A95B",
+      "matched_keyword": "",
+      "title": "Architectural Proposal for Future Qwen Models: Dynamic Depth-Scaling and Macro-Expert Modularity for Composable AI",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/discussions/41",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=模型本身",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "Qwen3.8-2.4T-A95B",
+      "variant": "Qwen/Qwen3.8-2.4T-A95B",
+      "family": "Qwen",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "该Issue为架构设计提案与功能讨论，非实际技术问题。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "模型本身",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Architectural Proposal for Future Qwen Models: Dynamic Depth-Scaling and Macro-Expert Modularity for Composable AI",
+          "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/discussions/41",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "模型本身",
+      "category": "其他",
+      "model": "Qwen3.8-2.4T-A95B",
+      "confidence": "low",
+      "brief": "该Issue为架构设计提案与功能讨论，非实际技术问题。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen3.8-2.4T-A95B",
+      "matched_keyword": "",
+      "title": "Qwen3.8 Max 0902?",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/discussions/40",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "",
+      "variant": "Qwen/Qwen3.8-2.4T-A95B",
+      "family": "Qwen",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Qwen3.8 Max 0902?",
+          "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/discussions/40",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": ""
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+      "matched_keyword": "",
+      "title": "Working recipe: DeepSeek-V4-Flash-Vision-Exp on 2× RTX PRO 6000 (SM120) with vLLM — 365k context, 7.06× concurrency (patched flashinfer + KV accounting fix)",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Vision-Exp/discussions/18",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=high verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "DeepSeek-V4-Flash-Vision-Exp",
+      "variant": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+      "family": "DeepSeek",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "分享成功部署配置与补丁，属用法/基准分享，非缺陷报告",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Working recipe: DeepSeek-V4-Flash-Vision-Exp on 2× RTX PRO 6000 (SM120) with vLLM — 365k context, 7.06× concurrency (patched flashinfer + KV accounting fix)",
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Vision-Exp/discussions/18",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "DeepSeek-V4-Flash-Vision-Exp",
+      "confidence": "high",
+      "brief": "分享成功部署配置与补丁，属用法/基准分享，非缺陷报告"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+      "matched_keyword": "",
+      "title": "[Bug] Drastic Token Consumption Difference for Base64 Image in Tool Result vs. Direct Upload",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Vision-Exp/discussions/17",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=True conf=medium verdict=模型本身",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "DeepSeek-V4-Flash-Vision-Exp",
+      "variant": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+      "family": "DeepSeek",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "多模态",
+      "symptom": "视觉编码器对Base64图像在不同输入路径下的处理逻辑不一致导致Token数差异",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "模型本身",
+      "confidence": "medium",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug] Drastic Token Consumption Difference for Base64 Image in Tool Result vs. Direct Upload",
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Vision-Exp/discussions/17",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "模型本身",
+      "category": "多模态",
+      "model": "DeepSeek-V4-Flash-Vision-Exp",
+      "confidence": "medium",
+      "brief": "视觉编码器对Base64图像在不同输入路径下的处理逻辑不一致导致Token数差异"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "zai-org/GLM-5.3",
+      "matched_keyword": "",
+      "title": "Point terminal-bench-3.0 eval result to unified harborframework/terminal-bench dataset",
+      "url": "https://huggingface.co/zai-org/GLM-5.3/discussions/16",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=模型本身",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "GLM-5.3",
+      "variant": "zai-org/GLM-5.3",
+      "family": "GLM",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "评估结果指向数据集的配置请求，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "模型本身",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Point terminal-bench-3.0 eval result to unified harborframework/terminal-bench dataset",
+          "url": "https://huggingface.co/zai-org/GLM-5.3/discussions/16",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "模型本身",
+      "category": "其他",
+      "model": "GLM-5.3",
+      "confidence": "low",
+      "brief": "评估结果指向数据集的配置请求，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "zai-org/GLM-5.3-Flash",
+      "matched_keyword": "",
+      "title": "Updated SGLang Docker Image for GLM-5.3-Flash",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/37",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "GLM-5.3-Flash",
+      "variant": "zai-org/GLM-5.3-Flash",
+      "family": "GLM",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "非技术问题，仅为镜像更新说明",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Updated SGLang Docker Image for GLM-5.3-Flash",
+          "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/37",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "GLM-5.3-Flash",
+      "confidence": "low",
+      "brief": "非技术问题，仅为镜像更新说明"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "zai-org/GLM-5.3-Flash",
+      "matched_keyword": "",
+      "title": "Folks with smaller VRAM but enough RAM  - Token per second almost doubled for Q3 (unsloth)",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/40",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "GLM-5.3-Flash",
+      "variant": "zai-org/GLM-5.3-Flash",
+      "family": "GLM",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "分享小显存下结合Q3量化与Unsloth提升推理吞吐的经验，非技术问题。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Folks with smaller VRAM but enough RAM  - Token per second almost doubled for Q3 (unsloth)",
+          "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/40",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "GLM-5.3-Flash",
+      "confidence": "low",
+      "brief": "分享小显存下结合Q3量化与Unsloth提升推理吞吐的经验，非技术问题。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "zai-org/GLM-5.3-Flash",
+      "matched_keyword": "",
+      "title": "GLM 5.3 Flash MoE?",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/39",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "",
+      "variant": "zai-org/GLM-5.3-Flash",
+      "family": "GLM",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "仅询问模型架构，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "GLM 5.3 Flash MoE?",
+          "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/39",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "仅询问模型架构，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "zai-org/GLM-5.3-Flash",
+      "matched_keyword": "",
+      "title": "GLM-5.3-Flash FP8 running on 2×L40S (sm_89) + EPYC 9845 — setup notes, patches and benchmarks",
+      "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/38",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=medium verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "",
+      "variant": "zai-org/GLM-5.3-Flash",
+      "family": "GLM",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "medium",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "GLM-5.3-Flash FP8 running on 2×L40S (sm_89) + EPYC 9845 — setup notes, patches and benchmarks",
+          "url": "https://huggingface.co/zai-org/GLM-5.3-Flash/discussions/38",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "medium",
+      "brief": ""
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "MiniMaxAI/MiniMax-H3",
+      "matched_keyword": "",
+      "title": "g",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/discussions/103",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "",
+      "variant": "MiniMaxAI/MiniMax-H3",
+      "family": "MiniMax",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "标题与正文为空或无意义，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "g",
+          "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/discussions/103",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "标题与正文为空或无意义，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "MiniMaxAI/MiniMax-H3",
+      "matched_keyword": "",
+      "title": "MiniMax Director — a ComfyUI timeline editor that covers every documented H3 feature",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/discussions/102",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "",
+      "variant": "MiniMaxAI/MiniMax-H3",
+      "family": "MiniMax",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "该issue为ComfyUI插件功能介绍与需求讨论，非模型/引擎技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "MiniMax Director — a ComfyUI timeline editor that covers every documented H3 feature",
+          "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3/discussions/102",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "该issue为ComfyUI插件功能介绍与需求讨论，非模型/引擎技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "matched_keyword": "",
+      "title": "Request to reconsider rejected access for NVIDIA Kimodo dependency",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/discussions/298",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "",
+      "variant": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "family": "Llama",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "权限与依赖申请，非模型或引擎技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Request to reconsider rejected access for NVIDIA Kimodo dependency",
+          "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/discussions/298",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "权限与依赖申请，非模型或引擎技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "google/timesfm-3.0-pytorch",
+      "matched_keyword": "",
+      "title": "MCP server: call TimesFM-3 from Claude / Cursor (median + q10–q90)",
+      "url": "https://huggingface.co/google/timesfm-3.0-pytorch/discussions/2",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 5,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "TimesFM-3",
+      "variant": "google/timesfm-3.0-pytorch",
+      "family": "Gemma",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "功能请求与集成示例，非模型或引擎技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "MCP server: call TimesFM-3 from Claude / Cursor (median + q10–q90)",
+          "url": "https://huggingface.co/google/timesfm-3.0-pytorch/discussions/2",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "TimesFM-3",
+      "confidence": "low",
+      "brief": "功能请求与集成示例，非模型或引擎技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "mistralai/Devstral-2-123B-Instruct-2512",
+      "matched_keyword": "",
+      "title": "Which model is better?  Devstral 2 or Mistral Medium 3.5 128B?",
+      "url": "https://huggingface.co/mistralai/Devstral-2-123B-Instruct-2512/discussions/25",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "其他",
+      "variant": "mistralai/Devstral-2-123B-Instruct-2512",
+      "family": "Mistral",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "用户咨询模型对比，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Which model is better?  Devstral 2 or Mistral Medium 3.5 128B?",
+          "url": "https://huggingface.co/mistralai/Devstral-2-123B-Instruct-2512/discussions/25",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "其他",
+      "confidence": "low",
+      "brief": "用户咨询模型对比，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/DeepSeek-V4-Flash-Vision-Exp-GGUF",
+      "matched_keyword": "",
+      "title": "Does the current model have dspark support?",
+      "url": "https://huggingface.co/unsloth/DeepSeek-V4-Flash-Vision-Exp-GGUF/discussions/5",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "",
+      "variant": "unsloth/DeepSeek-V4-Flash-Vision-Exp-GGUF",
+      "family": "DeepSeek",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "用户咨询功能支持情况，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Does the current model have dspark support?",
+          "url": "https://huggingface.co/unsloth/DeepSeek-V4-Flash-Vision-Exp-GGUF/discussions/5",
+          "type": "hf-discussion",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "用户咨询功能支持情况，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "Run 170 tokens/s Qwen3.8-Flash with MTP! ⚡",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/56",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 7,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=high verdict=其他",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "Qwen3.8-Flash",
+      "variant": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "family": "Qwen",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "标题为性能跑分分享，非技术问题报告。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Run 170 tokens/s Qwen3.8-Flash with MTP! ⚡",
+          "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/56",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "Qwen3.8-Flash",
+      "confidence": "high",
+      "brief": "标题为性能跑分分享，非技术问题报告。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "Strange URL lookup when using agentic tools with it",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/58",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=True conf=medium verdict=引擎问题",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "Qwen3.8-Flash-Next-GGUF",
+      "variant": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "family": "Qwen",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "工具调用",
+      "symptom": "智能体工具调用时触发异常URL解析或路由。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "medium",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Strange URL lookup when using agentic tools with it",
+          "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/58",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "工具调用",
+      "model": "Qwen3.8-Flash-Next-GGUF",
+      "confidence": "medium",
+      "brief": "智能体工具调用时触发异常URL解析或路由。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "Claude code cli errors out with llama.cpp",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/57",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "llama.cpp",
+      "variant": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "family": "Qwen",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "工具调用",
+      "symptom": "第三方CLI工具与llama.cpp兼容报错，缺乏复现细节",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Claude code cli errors out with llama.cpp",
+          "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/57",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "工具调用",
+      "model": "llama.cpp",
+      "confidence": "low",
+      "brief": "第三方CLI工具与llama.cpp兼容报错，缺乏复现细节"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/GLM-5.3-Flash-GGUF",
+      "matched_keyword": "",
+      "title": "Folks with smaller VRAM but enough RAM - Token per second almost doubled for Q3 (unsloth)",
+      "url": "https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF/discussions/15",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=high verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "GLM-5.3-Flash-GGUF",
+      "variant": "unsloth/GLM-5.3-Flash-GGUF",
+      "family": "GLM",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "分享小显存下Q3量化推理性能提升的benchmark结果",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Folks with smaller VRAM but enough RAM - Token per second almost doubled for Q3 (unsloth)",
+          "url": "https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF/discussions/15",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "GLM-5.3-Flash-GGUF",
+      "confidence": "high",
+      "brief": "分享小显存下Q3量化推理性能提升的benchmark结果"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/GLM-5.3-Flash-GGUF",
+      "matched_keyword": "",
+      "title": "IQ1_XXS Quants",
+      "url": "https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF/discussions/14",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "GLM-5.3",
+      "variant": "unsloth/GLM-5.3-Flash-GGUF",
+      "family": "GLM",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "仅标题无正文，疑似量化格式请求或功能申请，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "IQ1_XXS Quants",
+          "url": "https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF/discussions/14",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "GLM-5.3",
+      "confidence": "low",
+      "brief": "仅标题无正文，疑似量化格式请求或功能申请，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-27B-GGUF",
+      "matched_keyword": "",
+      "title": "Community benchmark: Qwen3.8-27B GGUF on an RTX 5060 Ti 16GB",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/discussions/121",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=其他",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "",
+      "variant": "unsloth/Qwen3.8-27B-GGUF",
+      "family": "Qwen",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "社区基准测试结果分享，非技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Community benchmark: Qwen3.8-27B GGUF on an RTX 5060 Ti 16GB",
+          "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/discussions/121",
+          "type": "hf-discussion",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "low",
+      "brief": "社区基准测试结果分享，非技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-27B-GGUF",
+      "matched_keyword": "",
+      "title": "incorrect quantization",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/discussions/120",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=量化问题",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "Qwen3.8-27B",
+      "variant": "unsloth/Qwen3.8-27B-GGUF",
+      "family": "Qwen",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "缺少详细描述与复现步骤，无法确认是否为真实技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "量化问题",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "incorrect quantization",
+          "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/discussions/120",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "量化问题",
+      "category": "其他",
+      "model": "Qwen3.8-27B",
+      "confidence": "low",
+      "brief": "缺少详细描述与复现步骤，无法确认是否为真实技术问题"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Muse-Glimmer-30B-GGUF",
+      "matched_keyword": "",
+      "title": "No imatrix file?",
+      "url": "https://huggingface.co/unsloth/Muse-Glimmer-30B-GGUF/discussions/19",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=量化问题",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "Muse-Glimmer-30B",
+      "variant": "unsloth/Muse-Glimmer-30B-GGUF",
+      "family": "通用",
+      "quant": "unsloth",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "用户询问仓库为何缺少imatrix文件，属用法咨询非Bug。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "量化问题",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "No imatrix file?",
+          "url": "https://huggingface.co/unsloth/Muse-Glimmer-30B-GGUF/discussions/19",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "量化问题",
+      "category": "其他",
+      "model": "Muse-Glimmer-30B",
+      "confidence": "low",
+      "brief": "用户询问仓库为何缺少imatrix文件，属用法咨询非Bug。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "RedHatAI/Qwen3.8-27B-NVFP4",
+      "matched_keyword": "",
+      "title": "Recipe",
+      "url": "https://huggingface.co/RedHatAI/Qwen3.8-27B-NVFP4/discussions/1",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=模型本身",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "Qwen3.8-27B-NVFP4",
+      "variant": "RedHatAI/Qwen3.8-27B-NVFP4",
+      "family": "Qwen",
+      "quant": "量化",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "标题与正文为空，仅为仓库说明，无技术问题描述",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "模型本身",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Recipe",
+          "url": "https://huggingface.co/RedHatAI/Qwen3.8-27B-NVFP4/discussions/1",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "模型本身",
+      "category": "其他",
+      "model": "Qwen3.8-27B-NVFP4",
+      "confidence": "low",
+      "brief": "标题与正文为空，仅为仓库说明，无技术问题描述"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "AesSedai/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "Q4_K_M/PLE vs IQ4_XS",
+      "url": "https://huggingface.co/AesSedai/Qwen3.8-Flash-Next-GGUF/discussions/4",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=量化问题",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "Qwen3.8-Flash-Next",
+      "variant": "AesSedai/Qwen3.8-Flash-Next-GGUF",
+      "family": "Qwen",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "标题仅为量化格式对比咨询，无具体报错或技术问题描述",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "量化问题",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Q4_K_M/PLE vs IQ4_XS",
+          "url": "https://huggingface.co/AesSedai/Qwen3.8-Flash-Next-GGUF/discussions/4",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "量化问题",
+      "category": "其他",
+      "model": "Qwen3.8-Flash-Next",
+      "confidence": "low",
+      "brief": "标题仅为量化格式对比咨询，无具体报错或技术问题描述"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "hf-discussion",
+      "repo": "cyankiwi/Qwen3.8-27B-AWQ-INT4",
+      "matched_keyword": "",
+      "title": "vLLM KVCache FP8 calibration data missing",
+      "url": "https://huggingface.co/cyankiwi/Qwen3.8-27B-AWQ-INT4/discussions/7",
+      "state": "open",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    "auto": false,
+    "reason": "is_bug=True conf=medium verdict=引擎问题",
+    "target_file": "qwen.json",
+    "entry": {
+      "id": "qwen-021",
+      "model": "vLLM",
+      "variant": "cyankiwi/Qwen3.8-27B-AWQ-INT4",
+      "family": "Qwen",
+      "quant": "cyankiwi",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "vLLM启用FP8 KVCache时缺失校准数据导致初始化失败",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "medium",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "vLLM KVCache FP8 calibration data missing",
+          "url": "https://huggingface.co/cyankiwi/Qwen3.8-27B-AWQ-INT4/discussions/7",
+          "type": "hf-discussion",
+          "date": "2026-09-02"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "其他",
+      "model": "vLLM",
+      "confidence": "medium",
+      "brief": "vLLM启用FP8 KVCache时缺失校准数据导致初始化失败"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "DeepSeek-R1 OR DeepSeek-R2 OR DeepSeek-V3",
+      "title": "[Bug]: step3 streaming tool parser returns empty arguments unless each token arrives in its own delta",
+      "url": "https://github.com/vllm-project/vllm/issues/55082",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Your current environment  <details> <summary>Environment</summary>  ```text Pure-Python logic bug in vllm/tool_parsers/step3_tool_parser.py. Reproducible on current main (e47356c63) on any hardware, CPU only, no GPU needed. Flags: --tool-call-parser step3 ```  </details>  ### 🐛 Describe the bug  With `--tool-call-parser step3`, a streamed tool call carries the correct function name but **empty arguments** unless every token happens to arrive in its own delta. Non-streaming is unaffected.  Re"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "vLLM",
+      "variant": "vllm-project/vllm",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "工具调用",
+      "symptom": "step3流式解析器未正确处理多token合并的delta导致参数累积失败",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug]: step3 streaming tool parser returns empty arguments unless each token arrives in its own delta",
+          "url": "https://github.com/vllm-project/vllm/issues/55082",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "工具调用",
+      "model": "vLLM",
+      "confidence": "high",
+      "brief": "step3流式解析器未正确处理多token合并的delta导致参数累积失败"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Gemma-4 OR Kimi OR Kimi-K2",
+      "title": "[Bug]: tool_choice='none' silently deletes tool-call-shaped content",
+      "url": "https://github.com/vllm-project/vllm/issues/55080",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Your current environment  <details> <summary>The output of <code>python collect_env.py</code></summary>  ```text Collecting environment information... uv is set ==============================         System Info ============================== OS                           : Ubuntu 22.04.5 LTS (x86_64) GCC version                  : (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0 Clang version                : 15.0.0 (git@github.com:llvm/llvm-project.git 4ba6a9c9f65bbc8bd06e3652cb20fd4dfc846137) CMake"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "vLLM",
+      "variant": "vllm-project/vllm",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "工具调用",
+      "symptom": "vLLM在tool_choice='none'时错误过滤了符合工具调用格式的模型输出内容。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug]: tool_choice='none' silently deletes tool-call-shaped content",
+          "url": "https://github.com/vllm-project/vllm/issues/55080",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "工具调用",
+      "model": "vLLM",
+      "confidence": "high",
+      "brief": "vLLM在tool_choice='none'时错误过滤了符合工具调用格式的模型输出内容。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug]: multimodal mm_encoder_only conversion fails across model families",
+      "url": "https://github.com/vllm-project/vllm/issues/55052",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Your current environment  <details> <summary>The output of <code>python collect_env.py</code></summary>  ```text Collecting environment information... ==============================         System Info ============================== OS                           : Ubuntu 22.04.3 LTS (x86_64) GCC version                  : (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 Clang version                : Could not collect CMake version                : version 3.22.1 Libc version                 : glibc-2.3"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "vLLM",
+      "variant": "vllm-project/vllm",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "多模态",
+      "symptom": "vLLM多模态编码器转换逻辑未兼容跨模型架构，导致转换失败。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug]: multimodal mm_encoder_only conversion fails across model families",
+          "url": "https://github.com/vllm-project/vllm/issues/55052",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "多模态",
+      "model": "vLLM",
+      "confidence": "high",
+      "brief": "vLLM多模态编码器转换逻辑未兼容跨模型架构，导致转换失败。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug]: multimodal mm_encoder_only conversion fails across model families",
+      "url": "https://github.com/vllm-project/vllm/issues/55051",
+      "state": "closed",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Your current environment  <details> <summary>The output of <code>python collect_env.py</code></summary>  Collecting environment information... ==============================         System Info ============================== OS                           : Ubuntu 22.04.3 LTS (x86_64) GCC version                  : (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 Clang version                : Could not collect CMake version                : version 3.22.1 Libc version                 : glibc-2.35  ====="
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "vLLM",
+      "variant": "vllm-project/vllm",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "多模态",
+      "symptom": "vLLM多模态编码器转换逻辑未兼容跨模型架构，导致转换失败。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug]: multimodal mm_encoder_only conversion fails across model families",
+          "url": "https://github.com/vllm-project/vllm/issues/55051",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "多模态",
+      "model": "vLLM",
+      "confidence": "high",
+      "brief": "vLLM多模态编码器转换逻辑未兼容跨模型架构，导致转换失败。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug]: embedding cache dtype combination finds no valid CUDA attention backend",
+      "url": "https://github.com/vllm-project/vllm/issues/55046",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Your current environment  <details> <summary>The output of <code>python collect_env.py</code></summary>  ```text Collecting environment information... ==============================         System Info ============================== OS                           : Ubuntu 22.04.3 LTS (x86_64) GCC version                  : (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 Clang version                : Could not collect CMake version                : version 3.22.1 Libc version                 : glibc-2.3"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "vLLM",
+      "variant": "vllm-project/vllm",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "Embedding cache dtype组合与CUDA attention后端不兼容导致选择失败。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug]: embedding cache dtype combination finds no valid CUDA attention backend",
+          "url": "https://github.com/vllm-project/vllm/issues/55046",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "其他",
+      "model": "vLLM",
+      "confidence": "high",
+      "brief": "Embedding cache dtype组合与CUDA attention后端不兼容导致选择失败。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "sgl-project/sglang",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "[Bug] GLM-5.3-Flash: CUDA OOM in fp8_mqa_logits during long-context prefill kills all TP ranks",
+      "url": "https://github.com/sgl-project/sglang/issues/37712",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Checklist  - [x] I searched related issues but found no solution. - [x] The bug persists in the latest version. - [ ] Issues without environment info and a minimal reproducible demo are hard to resolve and may receive no feedback. - [ ] If this is not a bug report but a general question, please start a discussion at https://github.com/sgl-project/sglang/discussions. Otherwise, it will be closed. - [x] Please use English. Otherwise, it will be closed.  ### Describe the bug  Serving GLM-5.3-Fl"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "cn-models.json",
+    "entry": {
+      "id": "cn-021",
+      "model": "GLM-5.3-Flash",
+      "variant": "sgl-project/sglang",
+      "family": "GLM",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "性能异常",
+      "symptom": "长上下文prefill阶段FP8 MQA logits计算导致显存溢出，引发TP ranks崩溃。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug] GLM-5.3-Flash: CUDA OOM in fp8_mqa_logits during long-context prefill kills all TP ranks",
+          "url": "https://github.com/sgl-project/sglang/issues/37712",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "性能异常",
+      "model": "GLM-5.3-Flash",
+      "confidence": "high",
+      "brief": "长上下文prefill阶段FP8 MQA logits计算导致显存溢出，引发TP ranks崩溃。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "sgl-project/sglang",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug] Ollama endpoints: /api/chat 500s on every request; /api/generate 500s when the client sends no num_predict",
+      "url": "https://github.com/sgl-project/sglang/issues/37711",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### Checklist  - [x] I searched related issues but found no solution. - [x] The bug persists in the latest version. - [x] Issues without environment info and a minimal reproducible demo are hard to resolve and may receive no feedback. - [x] If this is not a bug report but a general question, please start a discussion at https://github.com/sgl-project/sglang/discussions. Otherwise, it will be closed. - [x] Please use English. Otherwise, it will be closed.  ### Describe the bug  Two independent de"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "SGLang",
+      "variant": "sgl-project/sglang",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "输出错误",
+      "symptom": "Ollama兼容接口未正确处理默认参数导致请求返回500错误",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "[Bug] Ollama endpoints: /api/chat 500s on every request; /api/generate 500s when the client sends no num_predict",
+          "url": "https://github.com/sgl-project/sglang/issues/37711",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "输出错误",
+      "model": "SGLang",
+      "confidence": "high",
+      "brief": "Ollama兼容接口未正确处理默认参数导致请求返回500错误"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "GLM-5 OR GLM-5.1 OR Gemma-3",
+      "title": "Misc. bug: Eval bug error 0x80000406",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/28288",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 1,
+      "snippet": "### Name and Version  Processor: Snapdragon(R) X2 Elite - X2E84100 - Qualcomm Oryon(TM) CPU GPU: Qualcomm(R) Adreno(TM) X2-85 GPU (confirmed working via OpenCL) NPU driver: 30.0.220.11010 (1/27/2026) — confirmed alive and enumerated in Windows (Task Manager Performance tab shows NPU active) Hexagon SDK: 6.6.0.0 version: 0.3.0-dev (build 10775, commit 67a17c17c) built with Clang 22.1.8 for Windows arm64  ### Operating systems  Windows, Other? (Please let us know in description)  ### Which llama.c"
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=low verdict=环境问题",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "llama.cpp",
+      "variant": "ggml-org/llama.cpp",
+      "family": "Llama",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "报告信息截断，仅含硬件配置与错误码，无法定位具体根因",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "环境问题",
+      "confidence": "low",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Misc. bug: Eval bug error 0x80000406",
+          "url": "https://github.com/ggml-org/llama.cpp/issues/28288",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "环境问题",
+      "category": "其他",
+      "model": "llama.cpp",
+      "confidence": "low",
+      "brief": "报告信息截断，仅含硬件配置与错误码，无法定位具体根因"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "Eval bug: unpack8() corrupts MAT_MUL + CPY on Qualcomm Snapdragon X Elite",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/28290",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 2,
+      "snippet": "### Name and Version  .\\llama-cli.exe --version version: 0.3.0-dev (build 1, commit f027c4f) built with Clang 22.1.3 for Windows arm64  ### Operating systems  Windows  ### GGML backends  Vulkan  ### Hardware  Qualcomm Snapdragon X Elite X1E-80-100 Qualcomm Adreno X1-85  ### Models  Qwen3-4B-Thinking-2507-Q8_0.gguf https://huggingface.co/lmstudio-community/Qwen3-4B-Thinking-2507-GGUF  ### Problem description & steps to reproduce  There is an issue on SD X Elite. It gives totally garbage outputs. "
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "llama.cpp",
+      "variant": "ggml-org/llama.cpp",
+      "family": "Llama",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "输出错误",
+      "symptom": "Vulkan后端unpack8()函数在骁龙X Elite上导致矩阵运算数据损坏，引发输出乱码。",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Eval bug: unpack8() corrupts MAT_MUL + CPY on Qualcomm Snapdragon X Elite",
+          "url": "https://github.com/ggml-org/llama.cpp/issues/28290",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "输出错误",
+      "model": "llama.cpp",
+      "confidence": "high",
+      "brief": "Vulkan后端unpack8()函数在骁龙X Elite上导致矩阵运算数据损坏，引发输出乱码。"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "Eval bug: draft-mtp + --parallel > 1 causes cross-slot content contamination (not HIP-graphs related)",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/28286",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "## Summary  With `--spec-type draft-mtp` and `--parallel N` (N > 1), concurrent requests carrying clearly distinct prompts can produce responses that drift into content belonging to a *different* concurrent request's prompt/completion. Output stays valid UTF-8 with no garbage-token signature — it reads as plausible, on-topic-adjacent text, not obviously broken output, which makes it easy to miss in casual testing.  Reproduces identically with `GGML_CUDA_DISABLE_GRAPHS=1` set, so it's unrelated t"
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "llama.cpp",
+      "variant": "ggml-org/llama.cpp",
+      "family": "Llama",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "输出错误",
+      "symptom": "并行请求与投机解码状态隔离失败导致跨槽位内容污染",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Eval bug: draft-mtp + --parallel > 1 causes cross-slot content contamination (not HIP-graphs related)",
+          "url": "https://github.com/ggml-org/llama.cpp/issues/28286",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "输出错误",
+      "model": "llama.cpp",
+      "confidence": "high",
+      "brief": "并行请求与投机解码状态隔离失败导致跨槽位内容污染"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "ollama/ollama",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "Long-lived Ollama runner (keep_alive -1) emits corrupted <unused49> output after coexisting with a second model, persists until runner restart",
+      "url": "https://github.com/ollama/ollama/issues/18208",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 0,
+      "snippet": "### What is the issue?  # Bug report: long-lived runner (keep_alive -1) produces corrupted output (repeated placeholder tokens) after coexisting with a second model; fixed only by fully stopping and reloading the runner  ---  ## Environment  - **Hardware:** GMKtec EVO-X2 Mini PC — AMD Ryzen AI Max+ 395 (\"Strix Halo\"), Radeon 8060S iGPU (RDNA 3.5, gfx1151), 128GB LPDDR5X-8000 unified memory - **OS:** Ubuntu 26.04.1 LTS, kernel 7.0 - **GPU driver:** ROCm via AMD's repo installer, `amdgpu-install` "
+    },
+    "auto": true,
+    "reason": "DRY-RUN(qualified)",
+    "target_file": "intl-models.json",
+    "entry": {
+      "id": "intl-021",
+      "model": "Ollama",
+      "variant": "ollama/ollama",
+      "family": "Llama",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "输出错误",
+      "symptom": "Ollama多模型共存时上下文切换失败导致占位符Token泄漏",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "引擎问题",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "Long-lived Ollama runner (keep_alive -1) emits corrupted <unused49> output after coexisting with a second model, persists until runner restart",
+          "url": "https://github.com/ollama/ollama/issues/18208",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": true,
+      "verdict": "引擎问题",
+      "category": "输出错误",
+      "model": "Ollama",
+      "confidence": "high",
+      "brief": "Ollama多模型共存时上下文切换失败导致占位符Token泄漏"
+    }
+  },
+  {
+    "candidate": {
+      "source_type": "github-issue",
+      "repo": "cline/cline",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "File-edit approval window is read-only in Cline 4.x — cannot modify changes before accepting (regression vs. 3.x)",
+      "url": "https://github.com/cline/cline/issues/13795",
+      "state": "open",
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "comments": 1,
+      "snippet": "### Cline Surface  VSCode Extension  ### Cline Version  4.1.17  ### Beta version  - [ ] I am using a beta version of Cline  ### What happened?  In Cline 3.x, when the agent asked to modify a file, it opened an editable diff/confirmation view, letting me review and tweak the changes before accepting them.  After upgrading to 4.x (which migrated to the shared Cline SDK from 4.0.0 onward), that confirmation flow now opens a separate, read-only preview window: I can only click Accept/Reject. There i"
+    },
+    "auto": false,
+    "reason": "is_bug=False conf=high verdict=其他",
+    "target_file": "general.json",
+    "entry": {
+      "id": "gen-026",
+      "model": "",
+      "variant": "cline/cline",
+      "family": "通用",
+      "quant": "",
+      "engine": "",
+      "engineVersion": "",
+      "category": "其他",
+      "symptom": "VS Code扩展UI交互回归，非模型/引擎技术问题",
+      "rootCause": "",
+      "workaround": "",
+      "status": "待核验",
+      "fixedIn": "",
+      "severity": "unknown",
+      "verdict": "其他",
+      "confidence": "high",
+      "date": "2026-09",
+      "sources": [
+        {
+          "title": "File-edit approval window is read-only in Cline 4.x — cannot modify changes before accepting (regression vs. 3.x)",
+          "url": "https://github.com/cline/cline/issues/13795",
+          "type": "github-issue",
+          "date": "2026-09-03"
+        }
+      ],
+      "created_at": "2026-09-03",
+      "updated_at": "2026-09-03",
+      "_auto": true
+    },
+    "llm": {
+      "is_bug": false,
+      "verdict": "其他",
+      "category": "其他",
+      "model": "",
+      "confidence": "high",
+      "brief": "VS Code扩展UI交互回归，非模型/引擎技术问题"
+    }
+  }
+]

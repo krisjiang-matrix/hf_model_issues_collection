@@ -798,5 +798,275 @@
     ],
     "created_at": "2025-11-01",
     "updated_at": "2026-09-03"
+  },
+  {
+    "id": "gen-026",
+    "model": "vLLM",
+    "variant": "vllm-project/vllm",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "工具调用",
+    "symptom": "step3流式解析器未正确处理多token合并的delta导致参数累积失败",
+    "rootCause": "流式解析器在处理多token合并的delta时，未正确累积或拼接参数内容，导致参数解析为空。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug]: step3 streaming tool parser returns empty arguments unless each token arrives in its own delta",
+        "url": "https://github.com/vllm-project/vllm/issues/55082",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-027",
+    "model": "vLLM",
+    "variant": "vllm-project/vllm",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "工具调用",
+    "symptom": "vLLM在tool_choice='none'时错误过滤了符合工具调用格式的模型输出内容。",
+    "rootCause": "解析器处理tool_choice=none时，错误过滤了符合工具调用格式的输出内容，未保留有效文本。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug]: tool_choice='none' silently deletes tool-call-shaped content",
+        "url": "https://github.com/vllm-project/vllm/issues/55080",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-028",
+    "model": "vLLM",
+    "variant": "vllm-project/vllm",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "多模态",
+    "symptom": "vLLM多模态编码器转换逻辑未兼容跨模型架构，导致转换失败。",
+    "rootCause": "转换逻辑未适配多模型家族架构差异，导致mm_encoder_only转换因结构不匹配而失败。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug]: multimodal mm_encoder_only conversion fails across model families",
+        "url": "https://github.com/vllm-project/vllm/issues/55052",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-029",
+    "model": "vLLM",
+    "variant": "vllm-project/vllm",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "多模态",
+    "symptom": "vLLM多模态编码器转换逻辑未兼容跨模型架构，导致转换失败。",
+    "rootCause": "转换逻辑未适配多模型家族架构差异，导致提取编码器时配置映射缺失或解析失败。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug]: multimodal mm_encoder_only conversion fails across model families",
+        "url": "https://github.com/vllm-project/vllm/issues/55051",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-030",
+    "model": "vLLM",
+    "variant": "vllm-project/vllm",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "其他",
+    "symptom": "Embedding cache dtype组合与CUDA attention后端不兼容导致选择失败。",
+    "rootCause": "嵌入缓存特定数据类型组合未匹配到支持的CUDA注意力后端，导致运行时选择逻辑失败。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug]: embedding cache dtype combination finds no valid CUDA attention backend",
+        "url": "https://github.com/vllm-project/vllm/issues/55046",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-031",
+    "model": "SGLang",
+    "variant": "sgl-project/sglang",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "输出错误",
+    "symptom": "Ollama兼容接口未正确处理默认参数导致请求返回500错误",
+    "rootCause": "兼容层未校验必填参数或处理请求解析异常，导致未捕获异常直接返回500错误。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "[Bug] Ollama endpoints: /api/chat 500s on every request; /api/generate 500s when the client sends no num_predict",
+        "url": "https://github.com/sgl-project/sglang/issues/37711",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-032",
+    "model": "llama.cpp",
+    "variant": "ggml-org/llama.cpp",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "输出错误",
+    "symptom": "Vulkan后端unpack8()函数在骁龙X Elite上导致矩阵运算数据损坏，引发输出乱码。",
+    "rootCause": "unpack8()函数在骁龙X Elite硬件上执行矩阵乘法与拷贝时引发数据损坏，导致模型输出完全错误。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "Eval bug: unpack8() corrupts MAT_MUL + CPY on Qualcomm Snapdragon X Elite",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/28290",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-033",
+    "model": "llama.cpp",
+    "variant": "ggml-org/llama.cpp",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "输出错误",
+    "symptom": "并行请求与投机解码状态隔离失败导致跨槽位内容污染",
+    "rootCause": "draft-mtp并行模式下缓存槽位隔离失效，导致并发请求间显存读写竞争，引发输出内容交叉污染。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "high",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "Eval bug: draft-mtp + --parallel > 1 causes cross-slot content contamination (not HIP-graphs related)",
+        "url": "https://github.com/ggml-org/llama.cpp/issues/28286",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
+  },
+  {
+    "id": "gen-034",
+    "model": "Ollama",
+    "variant": "ollama/ollama",
+    "family": "通用",
+    "quant": "",
+    "engine": "",
+    "engineVersion": "",
+    "category": "输出错误",
+    "symptom": "Ollama多模型共存时上下文切换失败导致占位符Token泄漏",
+    "rootCause": "长驻进程多模型共存时上下文未正确隔离，导致状态污染，引发占位符重复输出。",
+    "workaround": "",
+    "status": "待核验",
+    "fixedIn": "",
+    "severity": "medium",
+    "verdict": "引擎问题",
+    "confidence": "high",
+    "date": "2026-09",
+    "sources": [
+      {
+        "title": "Long-lived Ollama runner (keep_alive -1) emits corrupted <unused49> output after coexisting with a second model, persists until runner restart",
+        "url": "https://github.com/ollama/ollama/issues/18208",
+        "type": "github-issue",
+        "date": "2026-09-03"
+      }
+    ],
+    "created_at": "2026-09-03",
+    "updated_at": "2026-09-03",
+    "_auto": true
   }
 ]

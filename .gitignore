@@ -7,6 +7,9 @@ venv/
 # 本地临时 HTTP 服务器日志
 /tmp/
 
+# 本地数据备份（不入库）
+.backup-data/
+
 # seen_urls 是本地的去重状态，但为了 Actions 增量去重需要提交（见 README）
 # 若不想跟踪可取消注释下面这行
 # automation/seen_urls.json
