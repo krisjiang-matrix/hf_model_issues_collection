@@ -1,0 +1,127 @@
+{
+  "generated_at": "2026-09-14T05:31:43.279516+00:00",
+  "since": "2026-09-13",
+  "count": 10,
+  "candidates": [
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "matched_keyword": "",
+      "title": "Successful DeepSeek-V4.1-Flash deployment on 4× A100 80GB using shi3z/deepseekv4.1-A100-custom — memory usage, load time and comparison with vLLM",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/discussions/43",
+      "state": "open",
+      "created_at": "2026-09-13",
+      "updated_at": "2026-09-13",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "matched_keyword": "",
+      "title": "Native Transformers text-backbone support proposal (#48721)",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/discussions/42",
+      "state": "open",
+      "created_at": "2026-09-13",
+      "updated_at": "2026-09-13",
+      "comments": 6,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "matched_keyword": "",
+      "title": "Independent CPU decode/prefill regression evidence for the index_k fix in PR #12",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/discussions/41",
+      "state": "open",
+      "created_at": "2026-09-13",
+      "updated_at": "2026-09-13",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "matched_keyword": "",
+      "title": "Request to Reconsider Rejected Access — Academic Research",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/discussions/305",
+      "state": "open",
+      "created_at": "2026-09-13",
+      "updated_at": "2026-09-13",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "hybrid Mamba/GDN + speculative decoding: Xid 31 in the align mamba path (fault address below the CUDA segment)",
+      "url": "https://github.com/vllm-project/vllm/issues/56736",
+      "state": "open",
+      "created_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "comments": 2,
+      "snippet": "AI-authored (disclosed): produced and verified on our live CMP 170HX cluster; the account owner is a user, not a vLLM dev.  ### Environment  - Model: Qwen3.8-27B (hybrid: 48 GDN linear-attention layers + 16 full-attention layers), AWQ int4 with eq8emb embeddings, `max_model_len 262144`. - Draft: DFlash2-W4A16, `num_speculative_tokens=7`. - Engine: v0.13.0 line via the `wtdcode/vllm-backport` port image (`cmp170hx-v013-nopatch`, i.e. **no local patches in the affected files**); V2 GPU model runne"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "sgl-project/sglang",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug] [NPU][MoE] AscendTPDispatcher downcasts FP32 routing weights to the hidden-state dtype",
+      "url": "https://github.com/sgl-project/sglang/issues/39351",
+      "state": "open",
+      "created_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "comments": 0,
+      "snippet": "### Checklist  - [ ] I searched related issues but found no solution. - [x] The bug persists in the latest version. - [ ] Issues without environment info and a minimal reproducible demo are hard to resolve and may receive no feedback. - [ ] If this is not a bug report but a general question, please start a discussion at https://github.com/sgl-project/sglang/discussions. Otherwise, it will be closed. - [ ] Please use English. Otherwise, it will be closed.  ### Describe the bug  The NPU TopK backe"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "sgl-project/sglang",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug] --enable-mixed-chunk corrupts mamba radix cache checkpoints on hybrid GDN models (mixed batch skips extra_buffer write, slot still donated)",
+      "url": "https://github.com/sgl-project/sglang/issues/39342",
+      "state": "open",
+      "created_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "comments": 0,
+      "snippet": "### Checklist  - [x] I searched related issues but found no solution. - [x] The bug persists in the latest version. - [x] Issues without environment info and a minimal reproducible demo are hard to resolve and may receive no feedback. - [x] If this is not a bug report but a general question, please start a discussion at https://github.com/sgl-project/sglang/discussions. Otherwise, it will be closed. - [x] Please use English. Otherwise, it will be closed.  ### Describe the bug  `--enable-mixed-ch"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "llama-perplexity: perplexity is not precision-monotonic on hybrid GDN architectures (qwen3_5) — full F16 scores worse than Q4_K_M",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/28879",
+      "state": "open",
+      "created_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "comments": 0,
+      "snippet": "## Summary  On a hybrid GDN model (`qwen3_5` architecture: 48 gated-delta-net linear-attention layers + 16 full-attention layers; model is Qwen3.8-27B), `llama-perplexity` results are **not monotonic in weight precision**: a full **F16** model scores *worse* than its own **Q4_K_M** quantization on 7 of 8 chunks, and the ranking among quants is inverted vs their bit width. Since full precision cannot legitimately lose to 4-bit weights, the metric — not the weights — is confounded on this architec"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "Eval bug: SIGSEGV in CPU compute path, thread-count-dependent race (Android/aarch64, Tensor G5), not content-dependent",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/28878",
+      "state": "open",
+      "created_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "comments": 0,
+      "snippet": "### Name and Version  ``` version: 0.4.0-dev (build 1, commit ad6c668) built with Clang 21.1.8 for Android aarch64 ``` Built from source via cmake, Release config, no custom flags.  ### Operating systems  Other (Android 17, via Termux — not a supported OS but the CPU backend/toolchain is standard aarch64 clang)  ### GGML backends  CPU  ### Hardware  Pixel 10 Pro XL, Google Tensor G5 (codename `laguna`), 8 CPU cores.  ### Models  Reproduced on two unrelated models, which points at the shared CPU "
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "CUDA error: misaligned address in ggml_cuda_op_unary<op_sigmoid> with long prompts on RTX 5090 Laptop (sm_120) — regression between d3146f2b5 and ad6c66839",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/28877",
+      "state": "open",
+      "created_at": "2026-09-14",
+      "updated_at": "2026-09-14",
+      "comments": 0,
+      "snippet": "### Environment  | Item | Value | |------|-------| | OS | Ubuntu 24.04.5 LTS (kernel 7.0.0-31-generic) | | GPU | **NVIDIA GeForce RTX 5090 Laptop GPU** (sm_120 / compute capability 12.0, 24 GB) | | Driver | 595.99.02 | | CUDA | 13.0.88 (V13.0.88) | | Compiler | GCC 13.3.0 | | Build | CMake + Ninja, `-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=120 -DGGML_CUDA_FORCE_CUBLAS=OFF -DGGML_CUDA_MXFP4=OFF -DCMAKE_CUDA_FLAGS_RELEASE=\"-O2\"` |  ### Model  `Qwen3.8-27B-IQ4_NL.gguf` (~14.6 GiB, Qwen3.5 arch) + "
+    }
+  ]
+}
