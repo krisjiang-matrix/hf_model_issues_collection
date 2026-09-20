@@ -1,0 +1,151 @@
+{
+  "generated_at": "2026-09-20T05:30:15.252925+00:00",
+  "since": "2026-09-19",
+  "count": 12,
+  "candidates": [
+    {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen3.8-Flash-Next",
+      "matched_keyword": "",
+      "title": "Model cannot SPLIT TENSOR and will not work in consumer multi gpu",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/discussions/62",
+      "state": "open",
+      "created_at": "2026-09-19",
+      "updated_at": "2026-09-19",
+      "comments": 2,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "matched_keyword": "",
+      "title": "Create app.py",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/discussions/60",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/dspark_gemma4_12b_block7",
+      "matched_keyword": "",
+      "title": "Create README.md",
+      "url": "https://huggingface.co/deepseek-ai/dspark_gemma4_12b_block7/discussions/4",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "meta-llama/Llama-3.2-3B-Instruct",
+      "matched_keyword": "",
+      "title": "Request to Reset Rejected Access for Llama-3.2-3B-Instruct",
+      "url": "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct/discussions/310",
+      "state": "open",
+      "created_at": "2026-09-19",
+      "updated_at": "2026-09-19",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "bartowski/occamy-ai_occamy-1.0-GGUF",
+      "matched_keyword": "",
+      "title": "What is the difference from https://huggingface.co/bartowski/Accio-Lab_occamy-1.0-GGUF",
+      "url": "https://huggingface.co/bartowski/occamy-ai_occamy-1.0-GGUF/discussions/1",
+      "state": "open",
+      "created_at": "2026-09-19",
+      "updated_at": "2026-09-19",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "[Bug]: Running GLM-5.3-Flash-NVFP4 on Hopper GPUs",
+      "url": "https://github.com/vllm-project/vllm/issues/57748",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 0,
+      "snippet": "### Your current environment  ``` `Collecting environment `information...` uv is set ==============================         System Info ============================== OS                           : Rocky Linux 9.8 (Blue Onyx) (x86_64) GCC version                  : (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14) Clang version                : Could not collect CMake version                : Could not collect Libc version                 : glibc-2.34  ==============================        PyTorch Info "
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "[RFC]: Encoder-Only Prefill in P/D deployment for DeepSeek V4.1 Flash",
+      "url": "https://github.com/vllm-project/vllm/issues/57738",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 0,
+      "snippet": "### Motivation.  ## Summary  DeepSeek-V4.1 Flash can construct the target model's reusable global KV state without executing the complete decoder stack. In a P/D deployment where Decode already rebuilds sliding-window attention (SWA) state through bounded replay, this creates an opportunity to eliminate decoder computation on Prefill and initialize DSpark entirely on Decode.  This RFC proposes:  - P processes the **entire prompt** through the causal encoder L0–L19 and the minimal L20 path needed"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "Title",
+      "url": "https://github.com/vllm-project/vllm/issues/57755",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 0,
+      "snippet": "**[Bug/Design] Pipeline parallelism × speculative decoding: `sampled_token_ids` broadcast contract breaks under spec decode, and a column-truncation workaround silently corrupts output with async scheduling**  # Summary  Pipeline parallelism and speculative decoding are individually supported but their combination does not work, and the failure modes are hostile:  1. It cannot boot: `_pp_broadcast_prev_sampled_token_ids` asserts `sampled_token_ids.shape[-1] == 1`, which never holds under specula"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug]: User-authored <|image_pad|> in text is misrecognized as image placeholder, causing image binding mismatch",
+      "url": "https://github.com/vllm-project/vllm/issues/57740",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 2,
+      "snippet": "### Your current environment  <details> <summary>The output of <code>python collect_env.py</code></summary>  ```text Collecting environment information... uv is set ==============================         System Info ============================== OS                           : Ubuntu 22.04.5 LTS (x86_64) GCC version                  : (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0 Clang version                : 14.0.0-1ubuntu1.1 CMake version                : Could not collect Libc version             "
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "sgl-project/sglang",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "[Bug] 0.5.20: `--quantization humming` crashes at weight load — `BlockQuantScaleParameter` has no attribute `format_ue8m0`",
+      "url": "https://github.com/sgl-project/sglang/issues/40393",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 2,
+      "snippet": " ## Describe the bug  On v0.5.20, serving a DeepSeek-family / GLM MLA checkpoint with `--quantization humming` crashes at the end of weight loading on every TP rank:  ``` File \"sglang/srt/models/deepseek_common/deepseek_weight_loader.py\", line 632, in post_load_weights     weight_scale.format_ue8m0 and weight_scale.dtype == torch.uint8 AttributeError: 'BlockQuantScaleParameter' object has no attribute 'format_ue8m0' ```  The same command works on v0.5.19, and on v0.5.20 with `--quantization w4af"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "GLM-5 OR GLM-5.1 OR Gemma-3",
+      "title": "Eval bug: CUDA MoE weighted-reduction fusion (#25952) breaks speculative-decoding exactness — MTP draft acceptance 0.82 → 0.48 and MTP becomes a net slowdown (bisected to b10751)",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29168",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 0,
+      "snippet": "### Name and Version  First bad build: **b10751**. Last good: **b10750**. Still present at **b11057** (today's head).  ``` $ llama-server --version version: 0.1.0-dev (build 10750, ...)   # last good version: 0.1.0-dev (build 10751, ...)   # first bad ```  ### Operating systems  Windows  ### GGML backends  CUDA  ### Hardware  RTX 2070 SUPER (sm_75, 8 GB), CUDA 12.4 prebuilt Windows release binaries (`llama-<b>-bin-win-cuda-12.4-x64.zip`), i7 8-core, 32 GB RAM. Partial offload: `-ngl 31 --n-cpu-m"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "[SYCL] Gated DeltaNet produces token soup on long prompts (greedy fails, dense models fine to 131K+)",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29167",
+      "state": "open",
+      "created_at": "2026-09-20",
+      "updated_at": "2026-09-20",
+      "comments": 0,
+      "snippet": "# Bug Report: llama.cpp DeltaNet SYCL kernel produces token soup on long prompts  ## Environment - **Hardware**: Intel Arc Pro B70 Graphics (32GB VRAM) - **OS**: Ubuntu 24.04 - **llama.cpp**: upstream fb92b3c (also tested ik_llama fork) - **Compute Runtime**: 26.35.39758.10 - **Models tested**: Qwen3.6-35B-A3B IQ4_XS, Qwen3.8-27B AD-Q4_K_M  ## Description When running Gated DeltaNet hybrid models (Qwen3.6, Qwen3.8) on llama.cpp with SYCL backend, short prompts work correctly but any prompt >~2K "
+    }
+  ]
+}
