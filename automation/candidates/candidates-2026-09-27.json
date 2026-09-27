@@ -1,0 +1,163 @@
+{
+  "generated_at": "2026-09-27T05:55:19.546536+00:00",
+  "since": "2026-09-26",
+  "count": 13,
+  "candidates": [
+    {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen-Image-2.1",
+      "matched_keyword": "",
+      "title": "Upload file_00000000911c82119fc394679a0abca1.png",
+      "url": "https://huggingface.co/Qwen/Qwen-Image-2.1/discussions/44",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 2,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "matched_keyword": "",
+      "title": "Request: a ~100B CED variant — the architecture fits our hardware, the 552B backbone does not",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/discussions/65",
+      "state": "closed",
+      "created_at": "2026-09-26",
+      "updated_at": "2026-09-26",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/dspark_qwen3_4b_block7",
+      "matched_keyword": "",
+      "title": "Create README.md",
+      "url": "https://huggingface.co/deepseek-ai/dspark_qwen3_4b_block7/discussions/5",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 2,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "deepseek-ai/DeepSeek-V4-Flash-Base",
+      "matched_keyword": "",
+      "title": "Create README.md",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Base/discussions/33",
+      "state": "open",
+      "created_at": "2026-09-26",
+      "updated_at": "2026-09-26",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "zai-org/GLM-OCR",
+      "matched_keyword": "",
+      "title": "complete pipeline serving",
+      "url": "https://huggingface.co/zai-org/GLM-OCR/discussions/66",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "MiniMaxAI/MiniMax-M2.7",
+      "matched_keyword": "",
+      "title": "Listed on OpenModelMap",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-M2.7/discussions/46",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "matched_keyword": "",
+      "title": "Request to reconsider rejected access — NVIDIA Kimodo local text encoder dependency",
+      "url": "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct/discussions/313",
+      "state": "open",
+      "created_at": "2026-09-26",
+      "updated_at": "2026-09-26",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "Does this quant actually support engram SSD offload or not in llama.cpp??",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/76",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "AesSedai/MiMo-V2.6-Pro-RL-GGUF",
+      "matched_keyword": "",
+      "title": "Does this work in ik_llama.cpp?",
+      "url": "https://huggingface.co/AesSedai/MiMo-V2.6-Pro-RL-GGUF/discussions/3",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 2,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "AesSedai/MiMo-V2.6-Flash-RL-GGUF",
+      "matched_keyword": "",
+      "title": "Strange llama.cpp mainline error [inconsistent sequence positions] for Q3_K",
+      "url": "https://huggingface.co/AesSedai/MiMo-V2.6-Flash-RL-GGUF/discussions/3",
+      "state": "open",
+      "created_at": "2026-09-26",
+      "updated_at": "2026-09-26",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "DeepSeek-V4 OR Devstral OR GLM-4",
+      "title": "[Bug]:  GLM-5.3-MXFP4 DP8 without EP crashes during FlashInfer autotune with CUDA illegal memory access",
+      "url": "https://github.com/vllm-project/vllm/issues/58864",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 1,
+      "snippet": "### Your current environment   Hardware: 8× NVIDIA GB300   vLLM commit: `4be061c5afab`   PyTorch: `2.13.0+cu130`  ### 🐛 Describe the bug  ### Description  GLM-5.3-MXFP4 fails to start with TP1/DP8 and expert parallelism disabled. The crash occurs during the 32K-token FlashInfer autotune dummy run in sparse MLA logical-to-physical top-k index conversion.  This reproduces on a clean vLLM `main` build and is unrelated to our CUTLASS MXFP4 EP changes.  ### Reproduction  Hardware: 8× NVIDIA B300   vL"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug]: MRotaryEmbedding + YaRN uses 4x original_max_position_embeddings for the YaRN correction range and cache size",
+      "url": "https://github.com/vllm-project/vllm/issues/58870",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 1,
+      "snippet": "### Your current environment  vLLM v0.30.0 (`vllm/vllm-openai:v0.30.0`), transformers 5.17.0. The same code is on `main` at eb0f2ca. The repro below runs on CPU.  ### 🐛 Describe the bug  When `rope_parameters` contain `mrope_section` and `rope_type: \"yarn\"` (e.g. Qwen3.5 / Qwen3-VL with YaRN enabled for long context), `get_rope` builds an `MRotaryEmbedding` with `max_position_embeddings = original_max_position_embeddings` ([`__init__.py#L257-L260`](https://github.com/vllm-project/vllm/blob/eb0f2"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ollama/ollama",
+      "matched_keyword": "DeepSeek-R1 OR DeepSeek-R2 OR DeepSeek-V3",
+      "title": "Intel UHD 0x4626 not detected by Vulkan backend on Windows — Ollama 0.34.4",
+      "url": "https://github.com/ollama/ollama/issues/18672",
+      "state": "open",
+      "created_at": "2026-09-27",
+      "updated_at": "2026-09-27",
+      "comments": 2,
+      "snippet": "### What is the issue?  ### What is the issue?  Ollama 0.34.4 does not detect or use the Intel UHD Graphics iGPU on Windows through Vulkan.  Windows Vulkan detects the GPU correctly, but Ollama's bundled `llama-server.exe` reports no available devices.  ### Hardware  * Intel NUC 12, Intel Core i5 * GPU: Intel(R) UHD Graphics * PCI device ID: `0x4626` * RAM: 32 GB DDR4-3200 * Windows 11  ### Intel graphics driver  `32.0.101.7088`  The driver was updated from `31.0.101.4502` specifically to test w"
+    }
+  ]
+}
