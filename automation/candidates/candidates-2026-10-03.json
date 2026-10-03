@@ -1,0 +1,163 @@
+{
+  "generated_at": "2026-10-03T05:51:45.369402+00:00",
+  "since": "2026-10-02",
+  "count": 13,
+  "candidates": [
+    {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen-Image-2.1",
+      "matched_keyword": "",
+      "title": "Running on <4gb Vram.",
+      "url": "https://huggingface.co/Qwen/Qwen-Image-2.1/discussions/54",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "Qwen/Qwen-Image-2.1",
+      "matched_keyword": "",
+      "title": "Upload я.jpg",
+      "url": "https://huggingface.co/Qwen/Qwen-Image-2.1/discussions/53",
+      "state": "closed",
+      "created_at": "2026-10-02",
+      "updated_at": "2026-10-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "openai/whisper-large-v3",
+      "matched_keyword": "",
+      "title": "3x faster Whisper with ConvRot Int8 - Special Speech to Text Premium App",
+      "url": "https://huggingface.co/openai/whisper-large-v3/discussions/240",
+      "state": "open",
+      "created_at": "2026-10-02",
+      "updated_at": "2026-10-02",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "unsloth studio vs strata engine for qwen3.8-flash-next",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/80",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 1,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "llama.cpp now supports MTP in main, but these quants don't seem compatible",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/79",
+      "state": "open",
+      "created_at": "2026-10-02",
+      "updated_at": "2026-10-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "unsloth/Qwen3.8-Flash-Next-GGUF",
+      "matched_keyword": "",
+      "title": "will the new llama.cpp build 11330+ support the mtp file?",
+      "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/discussions/78",
+      "state": "open",
+      "created_at": "2026-10-02",
+      "updated_at": "2026-10-02",
+      "comments": 4,
+      "snippet": ""
+    },
+    {
+      "source_type": "hf-discussion",
+      "repo": "bartowski/BAAI_AREX-2-GGUF",
+      "matched_keyword": "",
+      "title": "Chat Template Issue",
+      "url": "https://huggingface.co/bartowski/BAAI_AREX-2-GGUF/discussions/1",
+      "state": "open",
+      "created_at": "2026-10-02",
+      "updated_at": "2026-10-02",
+      "comments": 2,
+      "snippet": ""
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "vllm-project/vllm",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "[Bug]: Responses API streaming regenerates output item id/call_id in response.completed (breaks strict clients)",
+      "url": "https://github.com/vllm-project/vllm/issues/59834",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 0,
+      "snippet": "### Your current environment  - vLLM version: **v0.29.0** (`vllm/vllm-openai:v0.29.0`) - Model: Qwen3.8 family (tool calling enabled) - Endpoint: OpenAI-compatible **Responses API** — `/v1/responses` with `stream: true` - Client: strict OpenAI Responses consumer (a third-party agent runner)  ### 🐛 Describe the bug  When streaming `/v1/responses`, items delivered through `response.output_item.added` / `response.output_item.done` carry stable identifiers, but the terminal `response.completed` payl"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "sgl-project/sglang",
+      "matched_keyword": "DeepSeek-R1 OR DeepSeek-R2 OR DeepSeek-V3",
+      "title": "[Bug] DeepSeek V3 tool-call parser streams arguments \"{}\" when the closing fence and end tokens arrive in one stream event (MTP / --stream-interval > 1)",
+      "url": "https://github.com/sgl-project/sglang/issues/42327",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 0,
+      "snippet": "### Checklist  - [x] I searched related issues but found no solution. - [x] The bug persists in the latest version. - [x] Issues without environment info and a minimal reproducible demo are hard to resolve and may receive no feedback. - [x] If this is not a bug report but a general question, please start a discussion at https://github.com/sgl-project/sglang/discussions. Otherwise, it will be closed. - [x] Please use English. Otherwise, it will be closed.  ### Describe the bug  With `--tool-call-"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "Misc. bug: cuda - Available devices:   (none) since b11351",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29890",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 0,
+      "snippet": "### Name and Version  version: 0.5.0-dev (build 11351, commit 631109b34) built with GNU 11.4.0 for Linux x86_64    ### Operating systems  Linux  ### Which llama.cpp modules do you know to be affected?  llama-server  ### Command line  ```shell  ```  ### Problem description & steps to reproduce  cuda:  Available devices:  (none)  since b11351  linux, docker cuda 13.4  ### First Bad Commit  _No response_  ### Relevant log output  <details> <summary>Logs</summary> <!-- Copy-pasted short logs go into"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "Misc. bug: sycl: fix memory errors in mul_mat, split buffer, host pool",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29888",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 0,
+      "snippet": "### Name and Version  a868c3e3c  ### Operating systems  Linux  ### Which llama.cpp modules do you know to be affected?  Other (Please specify in the next section)  ### Command line  ```shell multiple errors & issues with memory / pointers in the SYCL implementation. ```  ### Problem description & steps to reproduce  `cd build && ctest .` and `test-backend-ops -b SYCL0` are good ways to reproduce many of them.  Some are related to multi-GPU (split memory, split tensors) that I cannot test locally"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ggml-org/llama.cpp",
+      "matched_keyword": "Kimi-Linear OR Llama-3.3 OR Llama-4",
+      "title": "[Android/aarch64] Backend score prefers the SVE2 variant, which is 2x slower than the non-SVE variant on 128-bit VL mobile cores",
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29884",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 0,
+      "snippet": "### Summary  `ggml_backend_load_best()` selects the CPU backend variant with the **highest `ggml_backend_score()`**, and the aarch64 score function awards points purely for the *presence of CPU features* (bit flags) — not for actual throughput. On Android builds this makes the SVE2 variant win on every ARMv9 mobile SoC, yet on 128-bit VL mobile cores it is ~**2× slower** than the non-SVE i8mm variant for prompt processing (prefill).  This is not a build misconfiguration — it is the upstream sele"
+    },
+    {
+      "source_type": "github-issue",
+      "repo": "ollama/ollama",
+      "matched_keyword": "Mistral-Small OR Moonlight OR Qwen3",
+      "title": "think: \"low\"/\"medium\"/\"high\" ignored for Qwen3.8 GGUF whose chat template supports reasoning_effort (always runs at template default xhigh)",
+      "url": "https://github.com/ollama/ollama/issues/18766",
+      "state": "open",
+      "created_at": "2026-10-03",
+      "updated_at": "2026-10-03",
+      "comments": 0,
+      "snippet": "### What is the issue?  For a Qwen3.8 27B GGUF whose embedded chat template supports graded reasoning effort, `/api/chat` accepts `think: \"low\"`, `\"medium\"` and `\"high\"` but behaves the same as `think: true`. Only `think: false` changes anything.  The template in the GGUF (`tokenizer.chat_template`) contains:  ```jinja {%- set resolved_reasoning_effort = reasoning_effort|default('xhigh') %} {%- if resolved_reasoning_effort not in ('xhigh', 'medium', 'low') %}    {{- raise_exception('Unexpected r"
+    }
+  ]
+}
